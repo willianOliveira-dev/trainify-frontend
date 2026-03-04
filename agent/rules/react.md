@@ -67,6 +67,24 @@ export function ProfileForm() {
 - Antes de criar uma nova variável de cor, **SEMPRE** busque na documentação do shadcn/ui sobre theming e veja se realmente é necessário.
 - **SEMPRE** veja os componentes que podem ser reutilizados para construção de uma página em @components/ui/page.tsx.
 
+# Modularização
+ - **SEMPRE** crie módulos separados para funcionalidades independentes do aplicativo.
+ - **SEMPRE** crie módulos separados para funcionalidades independentes do aplicativo.
+ - **SEMPRE** crie módulos separados para componentes reutilizáveis.
+ - **SEMPRE** crie módulos separados para páginas.
+ - **SEMPRE** crie módulos separados para rotas.
+ - **SEMPRE** crie módulos separados para utilitários.
+ - **SEMPRE** crie módulos separados para serviços (ex: API, autenticação, envio de e-mails, etc.).
+
+# Type Safety
+ - **SEMPRE** use TypeScript para tipar todas as interfaces, componentes, funções e variáveis.
+ - **SEMPRE** use Zod para validação de dados.
+ - **SEMPRE** use React Hook Form para criação e validação de formulários.
+ - **SEMPRE** use React Query para gerenciamento de estado assíncrono.
+ - **SEMPRE** use App Router para gerenciamento de rotas.
+ - **SEMPRE** use tipagem fortemente tipada para todas as interfaces, componentes, funções e variáveis.
+ - **SEMPRE** use tipagem forte, nunca use `any` ou `unknown`.
+
 ## Autenticação
 
 - **NUNCA** use middleware para verificação de autenticação. **SEMPRE** faça a verificação de sessão na própria página usando `authClient.useSession()`.
