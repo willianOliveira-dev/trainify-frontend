@@ -1,32 +1,32 @@
-"use client"
+"use client";
 
-import { Button } from "@/components/ui/button"
-import { authClient } from "@/lib/auth-client"
-import { Heart } from "lucide-react"
-import Image from "next/image"
-import Link from "next/link"
-import { useRouter } from "next/navigation"
-import { useEffect } from "react"
+import { Heart } from "lucide-react";
+import Image from "next/image";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { useEffect } from "react";
+import { Button } from "@/components/ui/button";
+import { authClient } from "@/lib/auth-client";
 
 export default function LoginPage() {
-  const router = useRouter()
-  const { data: session, isPending } = authClient.useSession()
+  const router = useRouter();
+  const { data: session, isPending } = authClient.useSession();
 
   useEffect(() => {
     if (session) {
-      router.replace("/")
+      router.replace("/");
     }
-  }, [session, router])
+  }, [session, router]);
 
   const handleGoogleLogin = async () => {
     await authClient.signIn.social({
       provider: "google",
       callbackURL: "/",
-    })
-  }
+    });
+  };
 
   if (isPending || session) {
-    return null
+    return null;
   }
 
   return (
@@ -53,7 +53,7 @@ export default function LoginPage() {
       <div className="bg-primary relative z-10 mt-auto flex w-full max-w-md flex-col items-center gap-16 rounded-t-3xl px-5 pt-12 pb-10">
         <div className="flex flex-col items-center gap-6 text-center">
           <h1 className="font-tight text-3xl leading-tight font-semibold text-white">
-                 O app que vai transformar a forma como você treina.
+            O app que vai transformar a forma como você treina.
           </h1>
 
           <Button
@@ -80,5 +80,5 @@ export default function LoginPage() {
         </p>
       </div>
     </div>
-  )
+  );
 }

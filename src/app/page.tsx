@@ -1,27 +1,25 @@
-"use client";
-
+import { getHomeData, getHomeDataResponse } from "@/lib/api/fetch-generated";
 import { authClient } from "@/lib/auth-client";
+import dayjs from "dayjs";
+import { headers } from 'next/headers';
 import Image from "next/image";
-import { useRouter } from "next/navigation";
-import { useEffect } from "react";
+import { redirect } from 'next/navigation';
 
-export default function Home() {
-  const router = useRouter();
-  const { data: session, isPending } = authClient.useSession();
-
-  useEffect(() => {
-    if (!isPending && !session) { 
-      router.replace("/auth");
+export default async function Home() {
+  const { data: session }= await authClient.getSession({
+    fetchOptions: {
+      headers: await headers()
     }
-  }, [session, isPending, router]);
-
-  if (isPending) {
-    return (
-      <div className="flex min-h-screen items-center justify-center bg-background">
-        <div className="h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent" />
-      </div>
-    );
+  });
+ 
+  if (!session?.user) {
+   redirect('/auth')
   }
+
+  const date: string  = dayjs(new Date()).format('YYYY-MM-DD')
+  const homeData: getHomeDataResponse = await getHomeData(date)
+
+  console.log(JSON.stringify(homeData.data, null, 2))
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-background text-foreground">

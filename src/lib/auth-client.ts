@@ -1,8 +1,8 @@
-import { env } from '@/config/env';
-import { createAuthClient } from 'better-auth/react';
+import { createAuthClient } from "better-auth/react";
+import { env } from "@/config/env";
 
 const authClient = createAuthClient({
-    baseURL: env.nextPublicApiUrl,
+  baseURL: env.nextPublicApiUrl,
 });
 
 export { authClient };
