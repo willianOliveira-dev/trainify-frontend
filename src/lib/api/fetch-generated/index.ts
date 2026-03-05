@@ -550,7 +550,7 @@ export type GetHomeData200ConsistencyByDay = {
  */
 export type GetHomeData200 = {
   activeWorkoutPlanId: string;
-  todayWorkoutDay: GetHomeData200TodayWorkoutDay;
+  todayWorkoutDay?: GetHomeData200TodayWorkoutDay;
   workoutStreak: number;
   consistencyByDay: GetHomeData200ConsistencyByDay;
 };

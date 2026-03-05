@@ -1,85 +1,104 @@
-import { getHomeData, getHomeDataResponse } from "@/lib/api/fetch-generated";
-import { authClient } from "@/lib/auth-client";
-import dayjs from "dayjs";
-import { headers } from 'next/headers';
-import Image from "next/image";
-import { redirect } from 'next/navigation';
+import { ConsistencyIndicators } from "@/components/consistency-indicators"
+import { NavigationBar } from "@/components/navigation-bar"
+import { TrainingDayCard } from "@/components/training-day-card"
+import { Button } from "@/components/ui/button"
+import { getHomeData } from "@/lib/api/fetch-generated"
+import { getSession } from "@/lib/get-session"
+import dayjs from "dayjs"
+import Image from "next/image"
+import { redirect } from "next/navigation"
 
 export default async function Home() {
-  const { data: session }= await authClient.getSession({
-    fetchOptions: {
-      headers: await headers()
+  const user = await getSession()
+  const today = dayjs().format("YYYY-MM-DD")
+  const response = await getHomeData(today)
+
+  if (response.status !== 200 || !user) {
+    if (response.status === 401) {
+      redirect("/auth")
     }
-  });
- 
-  if (!session?.user) {
-   redirect('/auth')
+    redirect('/auth')
   }
 
-  const date: string  = dayjs(new Date()).format('YYYY-MM-DD')
-  const homeData: getHomeDataResponse = await getHomeData(date)
-
-  console.log(JSON.stringify(homeData.data, null, 2))
+  const { todayWorkoutDay, workoutStreak, consistencyByDay } = response.data
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-background text-foreground">
-      <main className="flex min-h-screen w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-card sm:items-start">
+    <div className="flex min-h-screen w-full max-w-md mx-auto flex-col bg-background text-foreground pb-24">
+      <div className="relative h-72 w-full overflow-hidden rounded-b-3xl">
         <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
+          src="/home-banner.png"
+          alt="Home Banner"
+          fill
+          className="object-cover"
           priority
         />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight">
-            To get started, edit the page.tsx file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-muted-foreground">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
+        <div className="absolute inset-0 bg-linear-to-tr from-black/80 via-black/20 to-transparent" />
+        
+        <div className="absolute inset-0 flex flex-col justify-between p-5">
+          <Image
+            src="/logo.png"
+            alt="Trainify Logo"
+            width={95}
+            height={50}
+            className="object-contain"
+          />
+          
+          <div className="flex items-end justify-between">
+            <div className="flex flex-col gap-1">
+              <h1 className="font-tight text-2xl font-semibold leading-tight text-white">
+                Olá, {user.name}
+              </h1>
+              <p className="font-tight text-sm text-white/70">
+                Bora treinar hoje?
+              </p>
+            </div>
+            <Button className="h-9 cursor-pointer rounded-full bg-primary px-6 text-sm font-semibold text-white hover:bg-primary/90">
+              Bora!
+            </Button>
+          </div>
         </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-foreground/90 md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
+      </div>
+
+      <main className="flex flex-col gap-6 px-5 py-6">
+        <div className="flex flex-col gap-3">
+          <div className="flex items-center justify-between">
+            <h2 className="font-tight text-lg font-semibold">Consistência</h2>
+            <Button variant="link" className="h-auto p-0 text-xs font-normal text-primary">
+              Ver histórico
+            </Button>
+          </div>
+          <ConsistencyIndicators 
+            streak={workoutStreak} 
+            consistencyByDay={consistencyByDay} 
+          />
+        </div>
+
+        <div className="flex flex-col gap-3">
+          <div className="flex items-center justify-between">
+            <h2 className="font-tight text-lg font-semibold">Treino de Hoje</h2>
+            <Button variant="link" className="h-auto p-0 text-xs font-normal text-primary">
+              Ver treinos
+            </Button>
+          </div>
+          
+          {todayWorkoutDay ? (
+            <TrainingDayCard
+              name={todayWorkoutDay.name}
+              durationInSeconds={todayWorkoutDay.estimatedDurationInSeconds}
+              exercisesCount={todayWorkoutDay.exercisesCount}
+              weekDay={todayWorkoutDay.weekDay}
+              coverImageUrl={todayWorkoutDay.coverImageUrl}
+              isRest={todayWorkoutDay.isRest}
             />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-input px-5 transition-colors hover:bg-accent hover:text-accent-foreground md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
+          ) : (
+            <div className="flex h-32 items-center justify-center rounded-xl bg-muted text-muted-foreground">
+              Nenhum treino planejado para hoje.
+            </div>
+          )}
         </div>
       </main>
+
+      <NavigationBar activeTab="home" />
     </div>
-  );
+  )
 }
