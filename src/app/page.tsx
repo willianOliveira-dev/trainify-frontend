@@ -1,7 +1,7 @@
 import { ConsistencyIndicators } from "@/components/consistency-indicators"
 import { NavigationBar } from "@/components/navigation-bar"
-import { TrainingDayCard } from "@/components/training-day-card"
 import { Button } from "@/components/ui/button"
+import { WorkoutDayCard } from "@/components/workout-day/workout-day-card"
 import { getHomeData } from "@/lib/api/fetch-generated"
 import { getSession } from "@/lib/get-session"
 import dayjs from "dayjs"
@@ -82,7 +82,9 @@ export default async function Home() {
           </div>
           
           {todayWorkoutDay ? (
-            <TrainingDayCard
+            <WorkoutDayCard
+              planId={todayWorkoutDay.workoutPlanId}
+              dayId={todayWorkoutDay.id}
               name={todayWorkoutDay.name}
               durationInSeconds={todayWorkoutDay.estimatedDurationInSeconds}
               exercisesCount={todayWorkoutDay.exercisesCount}
@@ -98,7 +100,7 @@ export default async function Home() {
         </div>
       </main>
 
-      <NavigationBar activeTab="home" />
+      <NavigationBar/>
     </div>
   )
 }

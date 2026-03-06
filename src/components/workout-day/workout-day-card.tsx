@@ -1,10 +1,15 @@
+"use client"
+
 import { Badge } from "@/components/ui/badge";
+import { WEEK_DAY_MAP } from "@/constants/week-day-map.constant";
 import { Calendar, Dumbbell, Timer } from "lucide-react";
 import Image from "next/image";
-import { WEEK_DAY_MAP } from "@/constants/week-day-map.constant";
+import Link from "next/link";
 
 
-interface TrainingDayCardProps {
+interface WorkoutDayCardProps {
+  planId: string;
+  dayId: string;
   name: string;
   durationInSeconds: number;
   exercisesCount: number;
@@ -13,14 +18,16 @@ interface TrainingDayCardProps {
   isRest?: boolean;
 }
 
-export function TrainingDayCard({
+export function WorkoutDayCard({
+  planId,
+  dayId,
   name,
   durationInSeconds,
   exercisesCount,
   weekDay,
   coverImageUrl,
   isRest = false,
-}: TrainingDayCardProps) {
+}: WorkoutDayCardProps) {
   const durationInMinutes = Math.floor(durationInSeconds / 60);
 
   if (isRest) {
@@ -32,7 +39,7 @@ export function TrainingDayCard({
   }
 
   return (
-    <div className="group relative h-[200px] w-full overflow-hidden rounded-xl bg-black">
+    <Link href={`/workout-plans/${planId}/days/${dayId}`} className="group relative block h-[200px] w-full overflow-hidden rounded-xl bg-black">
       <Image
         src={coverImageUrl || "/workout-placeholder.png"}
         alt={name}
@@ -47,7 +54,7 @@ export function TrainingDayCard({
             {WEEK_DAY_MAP[weekDay]}
           </Badge>
         </div>
-
+ 
         <div className="flex flex-col gap-2">
           <h3 className="text-2xl font-bold text-white leading-tight">
             {name}
@@ -64,6 +71,6 @@ export function TrainingDayCard({
           </div>
         </div>
       </div>
-    </div>
+    </Link>
   );
 }
