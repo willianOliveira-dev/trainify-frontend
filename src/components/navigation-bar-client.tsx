@@ -1,4 +1,3 @@
-// components/navigation-bar/navigation-bar-client.tsx
 "use client";
 
 import { toast } from "@/lib/toast-utils";
@@ -84,7 +83,7 @@ export function NavigationBarClient({ calendarHref, hasActivePlan }: NavigationB
 
   return (
     <nav className="fixed bottom-0 left-0 right-0 z-50 max-w-xl mx-auto">
-      <div className="absolute inset-0 rounded-t-3xl bg-background/80 backdrop-blur-xl border-t border-border" />
+      <div className="absolute inset-0 rounded-t-3xl bg-background border-t border-border" />
       <div className="relative flex items-end justify-between px-4 pt-3 pb-5">
         {items.map((item) => {
           const Icon = item.icon;
