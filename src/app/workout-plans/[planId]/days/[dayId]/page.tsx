@@ -40,15 +40,8 @@ export default async function WorkoutDayDetailsPage({ params }: PageProps) {
     sessions,
   } = response.data;
 
-  const today = dayjs.utc().startOf('day');
-  const todaySessions = sessions.filter(session => {
-    if (!session.startedAt) return false;
-    const sessionDate = dayjs.utc(session.startedAt).startOf('day');
-    return sessionDate.isSame(today);
-  });
-
-  const activeSession = todaySessions.find((s) => !s.completedAt);
-  const isCompleted = todaySessions.some((s) => s.completedAt);
+  const activeSession = sessions.find((s) => !s.completedAt);
+  const isCompleted = sessions.some((s) => s.completedAt);
   const durationInMinutes = Math.floor(estimatedDurationInSeconds / 60);
   
   return (

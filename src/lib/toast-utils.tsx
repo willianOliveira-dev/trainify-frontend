@@ -135,7 +135,7 @@ export const showToast = ({
             sonnerToast.dismiss(t);
             onDismiss?.();
           }}
-          className="absolute hover:bg-transparent hover:text-white top-3 right-3 text-white/70 hover:text-white"
+          className="absolute hover:bg-transparent  top-3 right-3 text-white/70 hover:text-white"
         >
           <X className="size-4" />
         </Button>
