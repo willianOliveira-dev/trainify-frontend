@@ -2,10 +2,12 @@ import { NavigationBar } from "@/components/navigation-bar";
 import { Badge } from "@/components/ui/badge";
 import { WorkoutDayItem } from "@/components/workout-plan/workout-day-item";
 import { getWorkoutPlanDetailsdData } from "@/lib/api/fetch-generated";
-import { getSession } from "@/lib/get-session";
+import { authClient } from "@/lib/auth-client";
 import { Target } from "lucide-react";
+import { headers } from "next/headers";
 import Image from "next/image";
 import { redirect } from "next/navigation";
+import { toast } from "sonner";
 
 interface PageProps {
   params: Promise<{
@@ -15,17 +17,18 @@ interface PageProps {
 
 export default async function WorkoutPlanDetailsPage({ params }: PageProps) {
   const { planId } = await params;
-  const user = await getSession();
   
-  if (!user) {
+  const session = await authClient.getSession({
+    fetchOptions: {
+    headers: await headers()
+  }});
+  
+  if (!session) {
+    toast.error("Usuário não autenticado")
     redirect("/auth");
   }
 
   const response = await getWorkoutPlanDetailsdData(planId);
-
-  if (response.status === 401) {
-    redirect("/auth");
-  }
 
   if (response.status !== 200) {
     return (
@@ -35,9 +38,8 @@ export default async function WorkoutPlanDetailsPage({ params }: PageProps) {
     );
   }
 
-    const { name, workoutDays } = response.data;
+  const { name, workoutDays } = response.data;
     
-    console.log(workoutDays)
 
   return (
     <div className="flex min-h-screen w-full max-w-md mx-auto flex-col bg-background text-foreground pb-24">

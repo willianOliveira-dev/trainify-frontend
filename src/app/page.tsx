@@ -1,22 +1,35 @@
 import { ConsistencyIndicators } from "@/components/consistency-indicators"
+import { ErrorState } from "@/components/error-state"
 import { NavigationBar } from "@/components/navigation-bar"
 import { Button } from "@/components/ui/button"
 import { WorkoutDayCard } from "@/components/workout-day/workout-day-card"
 import { getHomeData } from "@/lib/api/fetch-generated"
-import { getSession } from "@/lib/get-session"
+import { authClient } from "@/lib/auth-client"
 import dayjs from "dayjs"
+import { Sparkles } from "lucide-react"; // ← Ícone para o botão
+import { headers } from "next/headers"
 import Image from "next/image"
+import Link from "next/link"
 import { redirect } from "next/navigation"
 
 export default async function Home() {
-  const user = await getSession()
   const today = dayjs().format("YYYY-MM-DD")
   const response = await getHomeData(today)
-  if (response.status !== 200 || !user) {
+
+  const session = await authClient.getSession({
+    fetchOptions: {
+      headers: await headers()
+    }
+  });
+  
+  if (response.status !== 200 || !session.data) {
     if (response.status === 401) {
       redirect("/auth")
     }
-    redirect('/auth')
+    return <>
+        <ErrorState />
+        <NavigationBar />
+      </>
   }
 
   const { todayWorkoutDay, workoutStreak, consistencyByDay } = response.data
@@ -45,15 +58,19 @@ export default async function Home() {
           <div className="flex items-end justify-between">
             <div className="flex flex-col gap-1">
               <h1 className="font-tight text-2xl font-semibold leading-tight text-white">
-                Olá, {user.name}
+                Olá, {session.data.user.name}
               </h1>
               <p className="font-tight text-sm text-white/70">
                 Bora treinar hoje?
               </p>
             </div>
-            <Button className="h-9 cursor-pointer rounded-full bg-primary px-6 text-sm font-semibold text-white hover:bg-primary/90">
-              Bora!
-            </Button>
+            <Link href="/ia-trainify" passHref>
+              <Button 
+                className="h-9 cursor-pointer rounded-full bg-primary px-6 text-sm font-semibold text-white hover:bg-primary/90"
+              >
+                Bora!
+              </Button>
+            </Link>
           </div>
         </div>
       </div>
@@ -92,8 +109,14 @@ export default async function Home() {
               isRest={todayWorkoutDay.isRest}
             />
           ) : (
-            <div className="flex h-32 items-center justify-center rounded-xl bg-muted text-muted-foreground">
-              Nenhum treino planejado para hoje.
+            <div className="flex flex-col h-32 items-center justify-center rounded-xl bg-muted text-muted-foreground gap-3">
+              <p>Nenhum treino planejado para hoje.</p>
+                <Button asChild size="sm" className="gap-2">
+                  <Link href="/ia-trainify" passHref>
+                      <Sparkles className="size-4" />
+                      Criar com IA
+                  </Link>
+                </Button>
             </div>
           )}
         </div>

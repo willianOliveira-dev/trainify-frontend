@@ -1,3 +1,4 @@
+import { ErrorState } from "@/components/error-state";
 import { NavigationBar } from "@/components/navigation-bar";
 import { Badge } from "@/components/ui/badge";
 import { ExerciseItem } from "@/components/workout-day/exercise-item";
@@ -9,7 +10,6 @@ import dayjs from "dayjs";
 import utc from "dayjs/plugin/utc";
 import { Calendar, Dumbbell, Timer } from "lucide-react";
 import Image from "next/image";
-import { redirect } from "next/navigation";
 
 dayjs.extend(utc);
 
@@ -24,11 +24,13 @@ export default async function WorkoutDayDetailsPage({ params }: PageProps) {
   const { planId, dayId } = await params;
 
   const response = await getWorkoutPlanDayDetailsData(planId, dayId);
-
+  
   if (response.status !== 200) {
-    redirect("/");
+    return <>
+        <ErrorState />
+        <NavigationBar /> 
+      </>
   }
-
   const {
     name,
     coverImageUrl,

@@ -1,13 +1,35 @@
 import { getHomeData } from "@/lib/api/fetch-generated";
+import { authClient } from "@/lib/auth-client";
 import dayjs from "dayjs";
+import { headers } from "next/headers";
 import { NavigationBarClient } from "./navigation-bar-client";
+import { redirect } from 'next/navigation'
 
 export async function NavigationBar() {
-  const response = await getHomeData(dayjs().format("YYYY-MM-DD"));
+  const session = await authClient.getSession({
+    fetchOptions: {
+      headers: await headers()
+    }
+  });
+  
+  let hasActivePlan = false;
+  let calendarHref = "/";
 
-  const calendarHref = response.status === 200 && response.data.activeWorkoutPlanId
-      ? `/workout-plans/${response.data.activeWorkoutPlanId}`
-      : `/`;
+  if (session) {
+    const response = await getHomeData(dayjs().format("YYYY-MM-DD"));
+    
+    if (response.status === 200 && response.data.activeWorkoutPlanId) {
+      hasActivePlan = true;
+      calendarHref = `/workout-plans/${response.data.activeWorkoutPlanId}`;
+    }
+  } else {
+    redirect("/auth");
+  }
 
-  return <NavigationBarClient calendarHref={calendarHref} />;
+  return (
+    <NavigationBarClient 
+      calendarHref={calendarHref}
+      hasActivePlan={hasActivePlan}
+    />
+  );
 }
