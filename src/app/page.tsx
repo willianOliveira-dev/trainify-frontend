@@ -12,7 +12,6 @@ export default async function Home() {
   const user = await getSession()
   const today = dayjs().format("YYYY-MM-DD")
   const response = await getHomeData(today)
-
   if (response.status !== 200 || !user) {
     if (response.status === 401) {
       redirect("/auth")

@@ -7,7 +7,7 @@ interface ConsistencyIndicatorsProps {
 }
 
 export function ConsistencyIndicators({ streak, consistencyByDay }: ConsistencyIndicatorsProps) {
-  const daysOfWeek = ["S", "T", "Q", "Q", "S", "S", "D"];
+  const daysOfWeek = ["D", "S", "T", "Q", "Q", "S", "S"];
   
   const sortedDates = Object.keys(consistencyByDay).sort();
 
