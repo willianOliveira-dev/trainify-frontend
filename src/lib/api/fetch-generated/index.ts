@@ -384,10 +384,10 @@ export type GetAllWorkoutPlansData500 = {
   message: string;
 };
 
-export type GetWorkoutPlanByIdData200WorkoutDaysItemWeekDay =
-  (typeof GetWorkoutPlanByIdData200WorkoutDaysItemWeekDay)[keyof typeof GetWorkoutPlanByIdData200WorkoutDaysItemWeekDay];
+export type GetWorkoutPlanDetailsdData200WorkoutDaysItemWeekDay =
+  (typeof GetWorkoutPlanDetailsdData200WorkoutDaysItemWeekDay)[keyof typeof GetWorkoutPlanDetailsdData200WorkoutDaysItemWeekDay];
 
-export const GetWorkoutPlanByIdData200WorkoutDaysItemWeekDay = {
+export const GetWorkoutPlanDetailsdData200WorkoutDaysItemWeekDay = {
   monday: "monday",
   tuesday: "tuesday",
   wednesday: "wednesday",
@@ -397,9 +397,9 @@ export const GetWorkoutPlanByIdData200WorkoutDaysItemWeekDay = {
   sunday: "sunday",
 } as const;
 
-export type GetWorkoutPlanByIdData200WorkoutDaysItem = {
+export type GetWorkoutPlanDetailsdData200WorkoutDaysItem = {
   id: string;
-  weekDay: GetWorkoutPlanByIdData200WorkoutDaysItemWeekDay;
+  weekDay: GetWorkoutPlanDetailsdData200WorkoutDaysItemWeekDay;
   name: string;
   isRest: boolean;
   coverImageUrl?: string;
@@ -410,16 +410,16 @@ export type GetWorkoutPlanByIdData200WorkoutDaysItem = {
 /**
  * Plano de treino encontrado
  */
-export type GetWorkoutPlanByIdData200 = {
+export type GetWorkoutPlanDetailsdData200 = {
   id: string;
   name: string;
-  workoutDays: GetWorkoutPlanByIdData200WorkoutDaysItem[];
+  workoutDays: GetWorkoutPlanDetailsdData200WorkoutDaysItem[];
 };
 
 /**
  * Sessão inválida ou ausente
  */
-export type GetWorkoutPlanByIdData401 = {
+export type GetWorkoutPlanDetailsdData401 = {
   statusCode: number;
   code: string;
   message: string;
@@ -428,7 +428,7 @@ export type GetWorkoutPlanByIdData401 = {
 /**
  * Plano de treino não encontrado
  */
-export type GetWorkoutPlanByIdData404 = {
+export type GetWorkoutPlanDetailsdData404 = {
   statusCode: number;
   code: string;
   message: string;
@@ -437,7 +437,7 @@ export type GetWorkoutPlanByIdData404 = {
 /**
  * Erro interno do servidor
  */
-export type GetWorkoutPlanByIdData500 = {
+export type GetWorkoutPlanDetailsdData500 = {
   statusCode: number;
   code: string;
   message: string;
@@ -1045,52 +1045,52 @@ export const getAllWorkoutPlansData = async (
 /**
  * @summary Retorna um plano de treino
  */
-export type getWorkoutPlanByIdDataResponse200 = {
-  data: GetWorkoutPlanByIdData200;
+export type getWorkoutPlanDetailsdDataResponse200 = {
+  data: GetWorkoutPlanDetailsdData200;
   status: 200;
 };
 
-export type getWorkoutPlanByIdDataResponse401 = {
-  data: GetWorkoutPlanByIdData401;
+export type getWorkoutPlanDetailsdDataResponse401 = {
+  data: GetWorkoutPlanDetailsdData401;
   status: 401;
 };
 
-export type getWorkoutPlanByIdDataResponse404 = {
-  data: GetWorkoutPlanByIdData404;
+export type getWorkoutPlanDetailsdDataResponse404 = {
+  data: GetWorkoutPlanDetailsdData404;
   status: 404;
 };
 
-export type getWorkoutPlanByIdDataResponse500 = {
-  data: GetWorkoutPlanByIdData500;
+export type getWorkoutPlanDetailsdDataResponse500 = {
+  data: GetWorkoutPlanDetailsdData500;
   status: 500;
 };
 
-export type getWorkoutPlanByIdDataResponseSuccess =
-  getWorkoutPlanByIdDataResponse200 & {
+export type getWorkoutPlanDetailsdDataResponseSuccess =
+  getWorkoutPlanDetailsdDataResponse200 & {
     headers: Headers;
   };
-export type getWorkoutPlanByIdDataResponseError = (
-  | getWorkoutPlanByIdDataResponse401
-  | getWorkoutPlanByIdDataResponse404
-  | getWorkoutPlanByIdDataResponse500
+export type getWorkoutPlanDetailsdDataResponseError = (
+  | getWorkoutPlanDetailsdDataResponse401
+  | getWorkoutPlanDetailsdDataResponse404
+  | getWorkoutPlanDetailsdDataResponse500
 ) & {
   headers: Headers;
 };
 
-export type getWorkoutPlanByIdDataResponse =
-  | getWorkoutPlanByIdDataResponseSuccess
-  | getWorkoutPlanByIdDataResponseError;
+export type getWorkoutPlanDetailsdDataResponse =
+  | getWorkoutPlanDetailsdDataResponseSuccess
+  | getWorkoutPlanDetailsdDataResponseError;
 
-export const getGetWorkoutPlanByIdDataUrl = (id: string) => {
+export const getGetWorkoutPlanDetailsdDataUrl = (id: string) => {
   return `/trainify/api/v1/workout-plans/${id}`;
 };
 
-export const getWorkoutPlanByIdData = async (
+export const getWorkoutPlanDetailsdData = async (
   id: string,
   options?: RequestInit,
-): Promise<getWorkoutPlanByIdDataResponse> => {
-  return customFetch<getWorkoutPlanByIdDataResponse>(
-    getGetWorkoutPlanByIdDataUrl(id),
+): Promise<getWorkoutPlanDetailsdDataResponse> => {
+  return customFetch<getWorkoutPlanDetailsdDataResponse>(
+    getGetWorkoutPlanDetailsdDataUrl(id),
     {
       ...options,
       method: "GET",
