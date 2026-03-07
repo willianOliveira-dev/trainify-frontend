@@ -53,7 +53,6 @@ export default async function StatsPage() {
     return `${hours}h${minutes}m`;
   };
 
-  console.log("stats data: ",response.data)
 
   const isStreakZero = workoutStreak === 0;
 

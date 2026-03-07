@@ -34,7 +34,6 @@ export default async function Home() {
 
   const { todayWorkoutDay, workoutStreak, consistencyByDay } = response.data
 
-  console.log("home data: ",response.data)
 
   return (
     <div className="flex min-h-screen w-full max-w-md mx-auto flex-col bg-background text-foreground pb-24">
