@@ -1,0 +1,5 @@
+<svg preserveAspectRatio="none" width="100%" height="100%" overflow="visible" style="display: block;" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+<g id="lucide/hourglass">
+<path id="Vector" d="M3.33333 14.6667H12.6667M3.33333 1.33333H12.6667M11.3333 14.6667V11.8853C11.3333 11.5317 11.1927 11.1927 10.9427 10.9427L8 8M8 8L5.05733 10.9427C4.80727 11.1927 4.66674 11.5317 4.66667 11.8853V14.6667M8 8L5.05733 5.05733C4.80727 4.80734 4.66674 4.46826 4.66667 4.11467V1.33333M8 8L10.9427 5.05733C11.1927 4.80734 11.3333 4.46826 11.3333 4.11467V1.33333" stroke="var(--stroke-0, #2B54FF)" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+</g>
+</svg>
