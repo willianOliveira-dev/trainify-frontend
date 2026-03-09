@@ -5,12 +5,14 @@ import { Form, FormControl, FormField, FormItem } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { useChat } from "@ai-sdk/react";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { code } from "@streamdown/code";
+import { mermaid } from "@streamdown/mermaid";
 import { DefaultChatTransport } from "ai";
 import { ArrowUp, Sparkles, X } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { parseAsBoolean, parseAsString, useQueryStates } from "nuqs";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef } from "react";
 import { useForm } from "react-hook-form";
 import { Streamdown } from "streamdown";
 import "streamdown/styles.css";
@@ -35,9 +37,7 @@ export function AiChatbot({ embedded = false, initialMessage }: ChatProps) {
     chat_initial_message: parseAsString,
   });
 
-  const [streamdownKey, setStreamdownKey] = useState(0);
-
-  const { messages, sendMessage, status, error } = useChat({
+  const { messages, sendMessage, status } = useChat({
     transport: new DefaultChatTransport({
       api: `${process.env.NEXT_PUBLIC_API_URL}/trainify/api/v1/ai/chat`,
       credentials: "include",
@@ -47,10 +47,6 @@ export function AiChatbot({ embedded = false, initialMessage }: ChatProps) {
     }),
     onError: (error) => {
       console.error("Erro no chat:", error);
-    },
-    onFinish: () => {
-      // Força atualização do Streamdown quando terminar
-      setStreamdownKey((prev) => prev + 1);
     },
   });
 
@@ -159,7 +155,7 @@ export function AiChatbot({ embedded = false, initialMessage }: ChatProps) {
             asChild
             className="font-tight text-primary hover:text-primary/80"
           >
-            <Link href="/">Acessar FIT.AI</Link>
+            <Link href="/">Acessar Trainify</Link>
           </Button>
         ) : (
           <Button
@@ -204,6 +200,8 @@ export function AiChatbot({ embedded = false, initialMessage }: ChatProps) {
 
                         return (
                           <Streamdown
+                            mode="streaming"
+                            plugins={{ code, mermaid }}
                             key={`${message.id}-part-${index}`}
                             isAnimating={isStreaming && isLastMessage}
                             className="font-tight text-sm leading-relaxed"
