@@ -1,6 +1,8 @@
 "use client"
 import { Badge } from "@/components/ui/badge";
 import { HelpCircle, Zap } from "lucide-react";
+import { parseAsBoolean, parseAsString, useQueryState } from "nuqs";
+
 
 interface ExerciseItemProps {
   name: string;
@@ -15,6 +17,14 @@ export function ExerciseItem({
   reps,
   restTimeInSeconds,
 }: ExerciseItemProps) {
+  const [isChatOpen, setIsChatOpen] = useQueryState("chat_open", parseAsBoolean.withDefault(false));
+  const [initialMessage, setInitialMessage] = useQueryState("chat_initial_message", parseAsString);
+
+  const handleHelpClick = () => {
+    setInitialMessage(`Como executar o exercício ${name} corretamente?`);
+    setIsChatOpen(true);
+  };
+
   return (
     <div className="flex h-24 items-center justify-between rounded-xl border border-muted p-5 bg-card">
       <div className="flex flex-col gap-3 justify-center h-full">
@@ -22,7 +32,10 @@ export function ExerciseItem({
           <h3 className="font-tight text-base font-semibold text-foreground">
             {name}
           </h3>
-          <button className="text-muted-foreground hover:text-foreground transition-all">
+          <button 
+            onClick={handleHelpClick}
+            className="text-muted-foreground hover:text-foreground transition-all"
+          >
             <HelpCircle className="size-5" />
           </button>
         </div>

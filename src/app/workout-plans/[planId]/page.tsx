@@ -7,7 +7,6 @@ import { Target } from "lucide-react";
 import { headers } from "next/headers";
 import Image from "next/image";
 import { redirect } from "next/navigation";
-import { toast } from "sonner";
 
 interface PageProps {
   params: Promise<{
@@ -17,14 +16,14 @@ interface PageProps {
 
 export default async function WorkoutPlanDetailsPage({ params }: PageProps) {
   const { planId } = await params;
-  
+
   const session = await authClient.getSession({
     fetchOptions: {
-    headers: await headers()
-  }});
+      headers: await headers(),
+    },
+  });
   
-  if (!session) {
-    toast.error("Usuário não autenticado")
+  if (!session.data) {
     redirect("/auth");
   }
 
@@ -39,7 +38,6 @@ export default async function WorkoutPlanDetailsPage({ params }: PageProps) {
   }
 
   const { name, workoutDays } = response.data;
-    
 
   return (
     <div className="flex min-h-screen w-full max-w-md mx-auto flex-col bg-background text-foreground pb-24">
@@ -51,11 +49,14 @@ export default async function WorkoutPlanDetailsPage({ params }: PageProps) {
           className="object-cover"
           priority
         />
-        <div 
-          className="absolute inset-0" 
-          style={{ backgroundImage: "linear-gradient(238.089deg, rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, 0.8) 100%)" }} 
+        <div
+          className="absolute inset-0"
+          style={{
+            backgroundImage:
+              "linear-gradient(238.089deg, rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, 0.8) 100%)",
+          }}
         />
-        
+
         <div className="absolute inset-0 flex flex-col justify-between p-5 pt-10">
           <Image
             src="/logo.png"
@@ -64,7 +65,7 @@ export default async function WorkoutPlanDetailsPage({ params }: PageProps) {
             height={50}
             className="object-contain"
           />
-          
+
           <div className="flex flex-col gap-3">
             <div className="flex items-center">
               <Badge className="bg-[#8585f9] hover:bg-[#8585f9]/90 text-white border-none gap-1.5 uppercase font-semibold text-[12px] px-3 py-1.5 rounded-full h-auto">
@@ -95,7 +96,7 @@ export default async function WorkoutPlanDetailsPage({ params }: PageProps) {
         ))}
       </main>
 
-      <NavigationBar/>
+      <NavigationBar />
     </div>
   );
 }

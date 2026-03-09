@@ -5,23 +5,28 @@ import { cn } from "@/lib/utils";
 import { BarChart2, Calendar, Home, Sparkles, User } from "lucide-react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
+import { parseAsBoolean, useQueryState } from "nuqs";
 
 interface NavigationBarClientProps {
   calendarHref: string;
   hasActivePlan: boolean;
 }
 
-export function NavigationBarClient({ calendarHref, hasActivePlan }: NavigationBarClientProps) {
+export function NavigationBarClient({
+  calendarHref,
+  hasActivePlan,
+}: NavigationBarClientProps) {
   const pathname = usePathname();
   const router = useRouter();
 
   const showPlanRequiredToast = () => {
     toast.info({
       title: "Ops! Plano necessário",
-      description: "Você precisa de um plano de treino ativo para acessar esta funcionalidade.",
+      description:
+        "Você precisa de um plano de treino ativo para acessar esta funcionalidade.",
       action: {
         label: "Criar com IA",
-        onClick: () => router.push("/ia-trainify"),
+        onClick: () => router.push("/ai-trainify"),
       },
       secondaryAction: {
         label: "Agora não",
@@ -30,45 +35,57 @@ export function NavigationBarClient({ calendarHref, hasActivePlan }: NavigationB
     });
   };
   const items = [
-    { 
-      id: "home", 
-      icon: Home, 
-      label: "Home", 
+    {
+      id: "home",
+      icon: Home,
+      label: "Home",
       href: "/",
-      requiresPlan: false
+      requiresPlan: false,
     },
-    { 
-      id: "calendar", 
-      icon: Calendar, 
-      label: "Calendário", 
+    {
+      id: "calendar",
+      icon: Calendar,
+      label: "Calendário",
       href: calendarHref,
-      requiresPlan: true
+      requiresPlan: true,
     },
-    { 
-      id: "ai-trainify", 
-      icon: Sparkles, 
-      label: "IA Trainify", 
-      href: "/ia-trainify", 
+    {
+      id: "ai-trainify",
+      icon: Sparkles,
+      label: "IA Trainify",
+      href: "/ai-trainify",
       primary: true,
-      requiresPlan: false
+      requiresPlan: false,
     },
-    { 
-      id: "stats", 
-      icon: BarChart2, 
-      label: "Evolução", 
+    {
+      id: "stats",
+      icon: BarChart2,
+      label: "Evolução",
       href: "/stats",
-      requiresPlan: true
+      requiresPlan: true,
     },
-    { 
-      id: "profile", 
-      icon: User, 
-      label: "Perfil", 
+    {
+      id: "profile",
+      icon: User,
+      label: "Perfil",
       href: "/profile",
-      requiresPlan: false
+      requiresPlan: false,
     },
   ];
 
-  const handleClick = (e: React.MouseEvent, item: typeof items[0]) => {
+  const [isChatOpen, setIsChatOpen] = useQueryState(
+    "chat_open",
+    parseAsBoolean.withDefault(false),
+  );
+
+  const handleClick = (e: React.MouseEvent, item: (typeof items)[0]) => {
+    if (item.id === "ai-trainify") {
+      e.preventDefault();
+      e.stopPropagation();
+      setIsChatOpen(true);
+      return false;
+    }
+
     if (item.requiresPlan && !hasActivePlan) {
       e.preventDefault();
       e.stopPropagation();
@@ -98,7 +115,7 @@ export function NavigationBarClient({ calendarHref, hasActivePlan }: NavigationB
                 onClick={(e) => handleClick(e, item)}
                 className={cn(
                   "relative flex flex-col items-center gap-1 -mt-8 z-10 transition-all duration-200",
-                  disabled && "opacity-50"
+                  disabled && "opacity-50",
                 )}
                 aria-disabled={disabled}
               >
@@ -109,15 +126,18 @@ export function NavigationBarClient({ calendarHref, hasActivePlan }: NavigationB
                   className={cn(
                     "relative flex items-center justify-center rounded-full bg-primary text-primary-foreground shadow-lg w-14 h-14 transition-transform duration-200",
                     active && !disabled && "-translate-y-1",
-                    !disabled && "hover:scale-105 active:scale-95"
+                    !disabled && "hover:scale-105 active:scale-95",
                   )}
                 >
-                  <Icon className="size-6 text-primary-foreground" strokeWidth={2.2} />
+                  <Icon
+                    className="size-6 text-primary-foreground"
+                    strokeWidth={2.2}
+                  />
                 </span>
                 <span
                   className={cn(
                     "text-xs font-semibold tracking-wide text-primary transition-opacity duration-200",
-                    active && !disabled ? "opacity-100" : "opacity-60"
+                    active && !disabled ? "opacity-100" : "opacity-60",
                   )}
                 >
                   {item.label}
@@ -133,20 +153,22 @@ export function NavigationBarClient({ calendarHref, hasActivePlan }: NavigationB
               onClick={(e) => handleClick(e, item)}
               className={cn(
                 "relative flex flex-col items-center gap-1 min-w-[48px] transition-all duration-150",
-                disabled ? "opacity-50" : "active:scale-90"
+                disabled ? "opacity-50" : "active:scale-90",
               )}
               aria-disabled={disabled}
             >
               <span
                 className={cn(
                   "relative z-10 transition-transform duration-200",
-                  active && !disabled && "-translate-y-0.5"
+                  active && !disabled && "-translate-y-0.5",
                 )}
               >
                 <Icon
                   className={cn(
                     "size-5 transition-colors duration-200",
-                    active && !disabled ? "text-primary" : "text-muted-foreground"
+                    active && !disabled
+                      ? "text-primary"
+                      : "text-muted-foreground",
                   )}
                   strokeWidth={active && !disabled ? 2.5 : 1.8}
                 />
@@ -156,7 +178,7 @@ export function NavigationBarClient({ calendarHref, hasActivePlan }: NavigationB
                   "relative z-10 text-xs tracking-wide leading-none transition-all duration-200",
                   active && !disabled
                     ? "text-primary font-semibold opacity-100"
-                    : "text-muted-foreground font-medium opacity-70"
+                    : "text-muted-foreground font-medium opacity-70",
                 )}
               >
                 {item.label}

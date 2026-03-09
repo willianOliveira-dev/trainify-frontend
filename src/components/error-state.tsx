@@ -1,7 +1,6 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import { NavigationBar } from "@/components/navigation-bar";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -12,10 +11,10 @@ interface ErrorStateProps {
   showSupport?: boolean;
 }
 
-export function ErrorState({ 
+export function ErrorState({
   title = "Ops! Algo deu errado",
   message = "Não foi possível carregar seus dados. Tente novamente em alguns instantes.",
-  showSupport = true
+  showSupport = true,
 }: ErrorStateProps) {
   const router = useRouter();
 
@@ -30,7 +29,7 @@ export function ErrorState({
           priority
         />
         <div className="absolute inset-0 bg-linear-to-tr from-black/80 via-black/20 to-transparent" />
-        
+
         <div className="absolute inset-0 flex flex-col justify-between p-5">
           <Image
             src="/logo.png"
@@ -47,15 +46,12 @@ export function ErrorState({
           <h1 className="font-tight text-2xl font-bold">{title}</h1>
           <p className="text-muted-foreground">{message}</p>
         </div>
-        
+
         <div className="flex flex-col gap-3 w-full max-w-xs">
-          <Button 
-            onClick={() => router.refresh()}
-            className="w-full"
-          >
+          <Button onClick={() => router.refresh()} className="w-full">
             Tentar novamente
           </Button>
-          
+
           {showSupport && (
             <Link href="/suporte" passHref>
               <Button variant="outline" className="w-full">

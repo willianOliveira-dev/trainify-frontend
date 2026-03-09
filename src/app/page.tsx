@@ -65,7 +65,7 @@ export default async function Home() {
                 Bora treinar hoje?
               </p>
             </div>
-            <Link href="/ia-trainify" passHref>
+            <Link href="/ai-trainify" passHref>
               <Button 
                 className="h-9 cursor-pointer rounded-full bg-primary px-6 text-sm font-semibold text-white hover:bg-primary/90"
               >

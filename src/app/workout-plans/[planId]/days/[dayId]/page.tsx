@@ -6,10 +6,13 @@ import { WorkoutActions } from "@/components/workout-day/workout-actions";
 import { WorkoutDetailsHeader } from "@/components/workout-day/workout-details-header";
 import { WEEK_DAY_MAP } from "@/constants/week-day-map.constant";
 import { getWorkoutPlanDayDetailsData } from "@/lib/api/fetch-generated";
+import { authClient } from "@/lib/auth-client";
 import dayjs from "dayjs";
 import utc from "dayjs/plugin/utc";
 import { Calendar, Dumbbell, Timer } from "lucide-react";
+import { headers } from "next/headers";
 import Image from "next/image";
+import { redirect } from "next/navigation";
 
 dayjs.extend(utc);
 
@@ -22,14 +25,25 @@ interface PageProps {
 
 export default async function WorkoutDayDetailsPage({ params }: PageProps) {
   const { planId, dayId } = await params;
+  const session = await authClient.getSession({
+    fetchOptions: {
+      headers: await headers(),
+    },
+  });
+
+  if (!session.data) {
+    redirect("/auth");
+  }
 
   const response = await getWorkoutPlanDayDetailsData(planId, dayId);
-  
+
   if (response.status !== 200) {
-    return <>
+    return (
+      <>
         <ErrorState />
-        <NavigationBar /> 
+        <NavigationBar />
       </>
+    );
   }
   const {
     name,
@@ -43,7 +57,7 @@ export default async function WorkoutDayDetailsPage({ params }: PageProps) {
   const activeSession = sessions.find((s) => !s.completedAt);
   const isCompleted = sessions.some((s) => s.completedAt);
   const durationInMinutes = Math.floor(estimatedDurationInSeconds / 60);
-  
+
   return (
     <div className="flex min-h-screen w-full max-w-md mx-auto flex-col bg-background text-foreground pb-25">
       <WorkoutDetailsHeader title={WEEK_DAY_MAP[weekDay].split("-")[0]} />
@@ -59,7 +73,10 @@ export default async function WorkoutDayDetailsPage({ params }: PageProps) {
           />
           <div className="absolute inset-0 flex flex-col justify-between p-6">
             <div className="flex">
-              <Badge variant="secondary" className="bg-white/10 backdrop-blur-md text-white border-none gap-1 uppercase font-semibold text-[10px] px-2.5 py-1">
+              <Badge
+                variant="secondary"
+                className="bg-white/10 backdrop-blur-md text-white border-none gap-1 uppercase font-semibold text-[10px] px-2.5 py-1"
+              >
                 <Calendar className="size-3" />
                 {WEEK_DAY_MAP[weekDay]}
               </Badge>
@@ -103,7 +120,7 @@ export default async function WorkoutDayDetailsPage({ params }: PageProps) {
         />
       </main>
 
-      <NavigationBar/>
+      <NavigationBar />
     </div>
   );
 }

@@ -3,12 +3,18 @@ import Image from "next/image";
 
 interface ConsistencyIndicatorsProps {
   streak: number;
-  consistencyByDay: Record<string, { workoutDayCompleted: boolean; workoutDayStarted: boolean }>;
+  consistencyByDay: Record<
+    string,
+    { workoutDayCompleted: boolean; workoutDayStarted: boolean }
+  >;
 }
 
-export function ConsistencyIndicators({ streak, consistencyByDay }: ConsistencyIndicatorsProps) {
+export function ConsistencyIndicators({
+  streak,
+  consistencyByDay,
+}: ConsistencyIndicatorsProps) {
   const daysOfWeek = ["D", "S", "T", "Q", "Q", "S", "S"];
-  
+
   const sortedDates = Object.keys(consistencyByDay).sort();
 
   return (
@@ -17,7 +23,7 @@ export function ConsistencyIndicators({ streak, consistencyByDay }: ConsistencyI
         {daysOfWeek.map((day, index) => {
           const date = sortedDates[index];
           const data = date ? consistencyByDay[date] : null;
-          
+
           let bgColor = "bg-white border border-border";
           if (data?.workoutDayCompleted) {
             bgColor = "bg-primary border-primary";
@@ -26,9 +32,16 @@ export function ConsistencyIndicators({ streak, consistencyByDay }: ConsistencyI
           }
 
           return (
-            <div key={`${day}-${index}`} className="flex flex-col items-center gap-2">
-              <div className={cn("size-5 rounded-md transition-colors", bgColor)} />
-              <span className="text-xs text-muted-foreground font-medium">{day}</span>
+            <div
+              key={date || `empty-${index}`}
+              className="flex flex-col items-center gap-2"
+            >
+              <div
+                className={cn("size-5 rounded-md transition-colors", bgColor)}
+              />
+              <span className="text-xs text-muted-foreground font-medium">
+                {day}
+              </span>
             </div>
           );
         })}
@@ -36,8 +49,14 @@ export function ConsistencyIndicators({ streak, consistencyByDay }: ConsistencyI
 
       <div className="flex flex-col items-center self-stretch justify-center px-5 py-2 bg-[rgba(240,97,0,0.08)] rounded-xl gap-2">
         <div className="flex items-center gap-2">
-            <Image src="/flame.svg" alt="Flame" width={16} height={20} className="shrink-0" />
-            <span className="text-lg font-bold text-black">{streak}</span>
+          <Image
+            src="/flame.svg"
+            alt="Flame"
+            width={16}
+            height={20}
+            className="shrink-0"
+          />
+          <span className="text-lg font-bold text-black">{streak}</span>
         </div>
       </div>
     </div>
