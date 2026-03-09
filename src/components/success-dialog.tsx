@@ -1,7 +1,6 @@
-// components/workout-day/success-dialog.tsx
 "use client";
 
-import { motion, AnimatePresence } from "framer-motion";
+import { AnimatePresence, motion } from "framer-motion";
 import { CheckCircle2, X } from "lucide-react";
 import { useEffect } from "react";
 import { Button } from "./ui/button";
@@ -9,7 +8,7 @@ import { Button } from "./ui/button";
 interface SuccessDialogProps {
   isOpen: boolean;
   onClose: () => void;
-  autoCloseDelayMs?: number; 
+  autoCloseDelayMs?: number;
   title?: string;
   message?: string;
 }
@@ -54,23 +53,22 @@ export function SuccessDialog({
             exit={{ y: 50 }}
             className="relative bg-white dark:bg-zinc-900 rounded-2xl shadow-2xl w-full max-w-sm overflow-hidden"
           >
-            <motion.div 
+            <motion.div
               initial={{ scaleX: 0 }}
               animate={{ scaleX: 1 }}
               transition={{ duration: autoCloseDelayMs / 1000, ease: "linear" }}
               className="absolute top-0 left-0 right-0 h-1 bg-green-500 origin-left"
             />
-            
-            <div className="p-6 flex flex-col items-center text-center">
 
+            <div className="p-6 flex flex-col items-center text-center">
               <motion.div
                 initial={{ scale: 0 }}
                 animate={{ scale: 1 }}
-                transition={{ 
-                  type: "spring", 
-                  stiffness: 200, 
+                transition={{
+                  type: "spring",
+                  stiffness: 200,
                   damping: 15,
-                  delay: 0.1 
+                  delay: 0.1,
                 }}
                 className="w-20 h-20 bg-green-100 dark:bg-green-900/30 rounded-full flex items-center justify-center mb-4"
               >
@@ -83,7 +81,6 @@ export function SuccessDialog({
                 </motion.div>
               </motion.div>
 
-
               <motion.h5
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -92,7 +89,6 @@ export function SuccessDialog({
               >
                 {title}
               </motion.h5>
-
 
               <motion.p
                 initial={{ opacity: 0, y: 10 }}
@@ -103,43 +99,41 @@ export function SuccessDialog({
                 {message}
               </motion.p>
 
-
               <motion.div
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ delay: 0.2 }}
                 className="absolute inset-0 pointer-events-none overflow-hidden"
               >
-                {[...Array(20)].map((_, i) => (
+                {Array.from({ length: 20 }).map((_) => (
                   <motion.div
-                    key={i}
-                    initial={{ 
+                    key={`confetti-${crypto.randomUUID()}`}
+                    initial={{
                       x: Math.random() * 400 - 200,
                       y: -20,
                       rotate: 0,
-                      scale: 0
+                      scale: 0,
                     }}
-                    animate={{ 
+                    animate={{
                       x: Math.random() * 400 - 200,
                       y: 400,
                       rotate: 720,
-                      scale: [0, 1, 0.5, 0]
+                      scale: [0, 1, 0.5, 0],
                     }}
-                    transition={{ 
+                    transition={{
                       duration: 2 + Math.random() * 2,
                       delay: 0.5 + Math.random() * 0.5,
                       repeat: Infinity,
-                      repeatDelay: 3
+                      repeatDelay: 3,
                     }}
                     className="absolute w-2 h-2 rounded-full"
                     style={{
                       backgroundColor: `hsl(${Math.random() * 360}, 80%, 60%)`,
-                      left: '50%',
+                      left: "50%",
                     }}
                   />
                 ))}
               </motion.div>
-
 
               <motion.button
                 whileHover={{ scale: 1.05 }}
@@ -150,7 +144,6 @@ export function SuccessDialog({
                 Continuar
               </motion.button>
             </div>
-
 
             <Button
               onClick={onClose}

@@ -1,22 +1,78 @@
 import { getHomeData } from "@/lib/api/fetch-generated";
+import { cn } from "@/lib/utils";
 import dayjs from "dayjs";
-import { NavigationBarClient } from "./navigation-bar-client";
+import { Calendar, ChartNoAxesColumn, House, UserRound } from "lucide-react";
+import Link from "next/link";
+import { ChatOpenButton } from "./chat-open-button";
+import { Button } from "./ui/button";
 
-export async function NavigationBar() {  
-  let hasActivePlan = false;
-  let calendarHref = "/";
+interface NavigationBarProps {
+  activePage?: "home" | "calendar" | "stats" | "profile";
+}
 
-    const response = await getHomeData(dayjs().format("YYYY-MM-DD"));
-    
-    if (response.status === 200 && response.data.activeWorkoutPlanId) {
-      hasActivePlan = true;
-      calendarHref = `/workout-plans/${response.data.activeWorkoutPlanId}`;
-    } 
+export async function NavigationBar({ activePage = "home" }: NavigationBarProps) {
+  const today = dayjs();
+  const homeData = await getHomeData(today.format("YYYY-MM-DD"));
+
+  const calendarHref =
+    homeData.status === 200 && homeData.data.activeWorkoutPlanId
+      ? `/workout-plans/${homeData.data.activeWorkoutPlanId}`
+      : null;
 
   return (
-    <NavigationBarClient 
-      calendarHref={calendarHref}
-      hasActivePlan={hasActivePlan}
-    />
+    <nav className="fixed bottom-0 left-0 right-0 z-50 flex items-center justify-center gap-6 rounded-t-[20px] border border-border bg-background px-6 py-4">
+      <Link href="/" className="p-3">
+        <House
+          className={cn(
+            "size-6",
+            activePage === "home" ? "text-foreground" : "text-muted-foreground",
+          )}
+        />
+      </Link>
+      {calendarHref ? (
+        <Link href={calendarHref} className="p-3">
+          <Calendar
+            className={cn(
+              "size-6",
+              activePage === "calendar"
+                ? "text-foreground"
+                : "text-muted-foreground",
+            )}
+          />
+        </Link>
+      ) : (
+        <Button className="p-3">
+          <Calendar
+            className={cn(
+              "size-6",
+              activePage === "calendar"
+                ? "text-foreground"
+                : "text-muted-foreground",
+            )}
+          />
+        </Button>
+      )}
+      <ChatOpenButton />
+      <Link href="/stats" className="p-3">
+        <ChartNoAxesColumn
+          className={cn(
+            "size-6",
+            activePage === "stats"
+              ? "text-foreground"
+              : "text-muted-foreground",
+          )}
+        />
+      </Link>
+      <Link href="/profile" className="p-3">
+        <UserRound
+          className={cn(
+            "size-6",
+            activePage === "profile"
+              ? "text-foreground"
+              : "text-muted-foreground",
+          )}
+        />
+      </Link>
+    </nav>
   );
 }

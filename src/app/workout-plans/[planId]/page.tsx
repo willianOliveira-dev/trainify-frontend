@@ -1,8 +1,14 @@
 import { NavigationBar } from "@/components/navigation-bar";
 import { Badge } from "@/components/ui/badge";
 import { WorkoutDayItem } from "@/components/workout-plan/workout-day-item";
-import { getWorkoutPlanDetailsdData } from "@/lib/api/fetch-generated";
+import { WEEKDAY_ORDER } from "@/constants/week-order.constant";
+import {
+  getHomeData,
+  getMe,
+  getWorkoutPlanDetailsdData,
+} from "@/lib/api/fetch-generated";
 import { authClient } from "@/lib/auth-client";
+import dayjs from "dayjs";
 import { Target } from "lucide-react";
 import { headers } from "next/headers";
 import Image from "next/image";
@@ -15,29 +21,34 @@ interface PageProps {
 }
 
 export default async function WorkoutPlanDetailsPage({ params }: PageProps) {
-  const { planId } = await params;
-
   const session = await authClient.getSession({
     fetchOptions: {
       headers: await headers(),
     },
   });
-  
-  if (!session.data) {
-    redirect("/auth");
-  }
 
-  const response = await getWorkoutPlanDetailsdData(planId);
+  if (!session.data?.user) redirect("/auth");
 
-  if (response.status !== 200) {
-    return (
-      <div className="flex min-h-screen items-center justify-center p-5 text-center">
-        <p className="text-muted-foreground">Plano de treino não encontrado.</p>
-      </div>
-    );
-  }
+  const { planId } = await params;
+  const [workoutPlanData, homeData, trainData] = await Promise.all([
+    getWorkoutPlanDetailsdData(planId),
+    getHomeData(dayjs().format("YYYY-MM-DD")),
+    getMe(),
+  ]);
 
-  const { name, workoutDays } = response.data;
+  const needsOnboarding =
+    (homeData.status === 200 && !homeData.data.activeWorkoutPlanId) ||
+    (trainData.status === 200 && !trainData.data);
+  if (needsOnboarding) redirect("/onboarding");
+
+  if (workoutPlanData.status !== 200) redirect("/");
+
+  const { name, workoutDays } = workoutPlanData.data;
+
+  const sortedDays = [...workoutDays].sort(
+    (a, b) =>
+      WEEKDAY_ORDER.indexOf(a.weekDay) - WEEKDAY_ORDER.indexOf(b.weekDay),
+  );
 
   return (
     <div className="flex min-h-screen w-full max-w-md mx-auto flex-col bg-background text-foreground pb-24">
@@ -81,7 +92,7 @@ export default async function WorkoutPlanDetailsPage({ params }: PageProps) {
       </div>
 
       <main className="flex flex-col gap-3 px-5 py-6">
-        {workoutDays.map((day) => (
+        {sortedDays.map((day) => (
           <WorkoutDayItem
             key={day.id}
             id={day.id}
@@ -96,7 +107,7 @@ export default async function WorkoutPlanDetailsPage({ params }: PageProps) {
         ))}
       </main>
 
-      <NavigationBar />
+      <NavigationBar activePage="calendar" />
     </div>
   );
 }

@@ -1,11 +1,14 @@
-import { ErrorState } from "@/components/error-state";
 import { NavigationBar } from "@/components/navigation-bar";
 import { Badge } from "@/components/ui/badge";
 import { ExerciseItem } from "@/components/workout-day/exercise-item";
 import { WorkoutActions } from "@/components/workout-day/workout-actions";
 import { WorkoutDetailsHeader } from "@/components/workout-day/workout-details-header";
 import { WEEK_DAY_MAP } from "@/constants/week-day-map.constant";
-import { getWorkoutPlanDayDetailsData } from "@/lib/api/fetch-generated";
+import {
+  getHomeData,
+  getMe,
+  getWorkoutPlanDayDetailsData,
+} from "@/lib/api/fetch-generated";
 import { authClient } from "@/lib/auth-client";
 import dayjs from "dayjs";
 import utc from "dayjs/plugin/utc";
@@ -34,25 +37,27 @@ export default async function WorkoutDayDetailsPage({ params }: PageProps) {
   if (!session.data) {
     redirect("/auth");
   }
+  const [workoutDayData, homeData, trainData] = await Promise.all([
+    getWorkoutPlanDayDetailsData(planId, dayId),
+    getHomeData(dayjs().format("YYYY-MM-DD")),
+    getMe(),
+  ]);
 
-  const response = await getWorkoutPlanDayDetailsData(planId, dayId);
+  const needsOnboarding =
+    (homeData.status === 200 && !homeData.data.activeWorkoutPlanId) ||
+    (trainData.status === 200 && !trainData.data);
+  if (needsOnboarding) redirect("/onboarding");
 
-  if (response.status !== 200) {
-    return (
-      <>
-        <ErrorState />
-        <NavigationBar />
-      </>
-    );
-  }
+  if (workoutDayData.status !== 200) redirect("/");
+
   const {
     name,
-    coverImageUrl,
-    estimatedDurationInSeconds,
     weekDay,
+    estimatedDurationInSeconds,
     exercises,
     sessions,
-  } = response.data;
+    coverImageUrl,
+  } = workoutDayData.data;
 
   const activeSession = sessions.find((s) => !s.completedAt);
   const isCompleted = sessions.some((s) => s.completedAt);

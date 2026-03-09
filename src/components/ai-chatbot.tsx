@@ -1,10 +1,8 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import { Form, FormControl, FormField, FormItem } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { useChat } from "@ai-sdk/react";
-import { zodResolver } from "@hookform/resolvers/zod";
 import { code } from "@streamdown/code";
 import { mermaid } from "@streamdown/mermaid";
 import { DefaultChatTransport } from "ai";
@@ -12,19 +10,11 @@ import { ArrowUp, Sparkles, X } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { parseAsBoolean, parseAsString, useQueryStates } from "nuqs";
-import { useEffect, useRef } from "react";
-import { useForm } from "react-hook-form";
+import { useEffect, useRef, useState } from "react";
 import { Streamdown } from "streamdown";
 import "streamdown/styles.css";
-import { z } from "zod";
 
 const SUGGESTED_MESSAGES = ["Monte meu plano de treino"];
-
-const chatFormSchema = z.object({
-  message: z.string().min(1),
-});
-
-type ChatFormValues = z.infer<typeof chatFormSchema>;
 
 interface ChatProps {
   embedded?: boolean;
@@ -50,11 +40,7 @@ export function AiChatbot({ embedded = false, initialMessage }: ChatProps) {
     },
   });
 
-  const form = useForm<ChatFormValues>({
-    resolver: zodResolver(chatFormSchema),
-    defaultValues: { message: "" },
-  });
-
+  const [message, setMessage] = useState("");
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const initialMessageSentRef = useRef(false);
 
@@ -100,9 +86,10 @@ export function AiChatbot({ embedded = false, initialMessage }: ChatProps) {
     setChatParams({ chat_open: false, chat_initial_message: null });
   };
 
-  const onSubmit = (values: ChatFormValues) => {
-    sendMessage({ text: values.message });
-    form.reset();
+  const handleSubmit = () => {
+    if (!message.trim() || isLoading) return;
+    sendMessage({ text: message });
+    setMessage("");
   };
 
   const handleSuggestion = (text: string) => {
@@ -197,7 +184,6 @@ export function AiChatbot({ embedded = false, initialMessage }: ChatProps) {
                       if (part.type === "text") {
                         const isLastMessage =
                           messages[messages.length - 1]?.id === message.id;
-
                         return (
                           <Streamdown
                             mode="streaming"
@@ -261,36 +247,25 @@ export function AiChatbot({ embedded = false, initialMessage }: ChatProps) {
           </div>
         )}
 
-        <Form {...form}>
-          <form
-            onSubmit={form.handleSubmit(onSubmit)}
-            className="flex items-center gap-2"
+        <div className="flex items-center gap-2">
+          <Input
+            value={message}
+            onChange={(e) => setMessage(e.target.value)}
+            onKeyDown={(e) =>
+              e.key === "Enter" && !e.shiftKey && handleSubmit()
+            }
+            placeholder="Digite sua mensagem..."
+            className="h-11 rounded-full border-border/50 bg-secondary/30 px-5 font-tight text-sm text-foreground placeholder:text-muted-foreground focus-visible:ring-1 focus-visible:ring-primary/30"
+          />
+          <Button
+            onClick={handleSubmit}
+            disabled={!message.trim() || isLoading}
+            size="icon"
+            className="h-11 w-11 shrink-0 rounded-full bg-primary text-primary-foreground shadow-md shadow-primary/20 hover:bg-primary/90 disabled:opacity-50"
           >
-            <FormField
-              control={form.control}
-              name="message"
-              render={({ field }) => (
-                <FormItem className="flex-1">
-                  <FormControl>
-                    <Input
-                      {...field}
-                      placeholder="Digite sua mensagem..."
-                      className="h-11 rounded-full border-border/50 bg-secondary/30 px-5 font-tight text-sm text-foreground placeholder:text-muted-foreground focus-visible:ring-1 focus-visible:ring-primary/30"
-                    />
-                  </FormControl>
-                </FormItem>
-              )}
-            />
-            <Button
-              type="submit"
-              disabled={!form.watch("message").trim() || isLoading}
-              size="icon"
-              className="h-11 w-11 shrink-0 rounded-full bg-primary text-primary-foreground shadow-md shadow-primary/20 hover:bg-primary/90 disabled:opacity-50"
-            >
-              <ArrowUp className="h-5 w-5" />
-            </Button>
-          </form>
-        </Form>
+            <ArrowUp className="h-5 w-5" />
+          </Button>
+        </div>
       </div>
     </div>
   );
