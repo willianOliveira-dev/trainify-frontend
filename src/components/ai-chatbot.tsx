@@ -6,7 +6,7 @@ import { useChat } from "@ai-sdk/react";
 import { code } from "@streamdown/code";
 import { mermaid } from "@streamdown/mermaid";
 import { DefaultChatTransport } from "ai";
-import { ArrowUp, Sparkles, X } from "lucide-react";
+import { AlertCircle, ArrowUp, Sparkles, X } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { parseAsBoolean, parseAsString, useQueryStates } from "nuqs";
@@ -27,16 +27,25 @@ export function AiChatbot({ embedded = false, initialMessage }: ChatProps) {
     chat_initial_message: parseAsString,
   });
 
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+
   const { messages, sendMessage, status } = useChat({
     transport: new DefaultChatTransport({
       api: `${process.env.NEXT_PUBLIC_API_URL}/trainify/api/v1/ai/chat`,
       credentials: "include",
-      headers: {
-        "Content-Type": "application/json",
-      },
     }),
     onError: (error) => {
-      console.error("Erro no chat:", error);
+      console.log(error);
+      const isQuota =
+        error?.message?.includes("quota") ||
+        error?.message?.includes("exceeded") ||
+        error?.message?.includes("AI_QUOTA_EXCEEDED");
+
+      setErrorMessage(
+        isQuota
+          ? "Limite de requisições atingido. Tente novamente mais tarde."
+          : "Erro ao processar sua mensagem. Tente novamente.",
+      );
     },
   });
 
@@ -88,11 +97,13 @@ export function AiChatbot({ embedded = false, initialMessage }: ChatProps) {
 
   const handleSubmit = () => {
     if (!message.trim() || isLoading) return;
+    setErrorMessage(null);
     sendMessage({ text: message });
     setMessage("");
   };
 
   const handleSuggestion = (text: string) => {
+    setErrorMessage(null);
     sendMessage({ text });
   };
 
@@ -227,6 +238,20 @@ export function AiChatbot({ embedded = false, initialMessage }: ChatProps) {
               </div>
             </div>
           )}
+
+          {errorMessage && (
+            <div className="flex justify-start">
+              <div className="mr-2 flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-destructive/10">
+                <AlertCircle className="h-3 w-3 text-destructive" />
+              </div>
+              <div className="max-w-[85%] rounded-2xl bg-destructive/10 px-4 py-2.5">
+                <p className="font-tight text-sm leading-relaxed text-destructive">
+                  {errorMessage}
+                </p>
+              </div>
+            </div>
+          )}
+
           <div ref={messagesEndRef} />
         </div>
       </div>

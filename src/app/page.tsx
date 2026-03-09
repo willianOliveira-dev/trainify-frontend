@@ -5,7 +5,6 @@ import Image from "next/image";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { ConsistencyIndicators } from "@/components/consistency-indicators";
-import { ErrorState } from "@/components/error-state";
 import { NavigationBar } from "@/components/navigation-bar";
 import { Button } from "@/components/ui/button";
 import { WorkoutDayCard } from "@/components/workout-day/workout-day-card";
