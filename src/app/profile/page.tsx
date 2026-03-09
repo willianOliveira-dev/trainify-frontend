@@ -6,6 +6,7 @@ import { authClient } from "@/lib/auth-client";
 import dayjs from "dayjs";
 import { BicepsFlexed, Ruler, User, Weight } from "lucide-react";
 import { headers } from "next/headers";
+import Image from "next/image";
 import { redirect } from "next/navigation";
 
 export default async function ProfilePage() {
@@ -43,12 +44,13 @@ export default async function ProfilePage() {
   return (
     <div className="flex min-h-svh flex-col bg-background pb-24">
       <div className="flex h-[56px] items-center px-5">
-        <p
-          className="text-[22px] uppercase leading-[1.15] text-foreground"
-          style={{ fontFamily: "var(--font-anton)" }}
-        >
-          Fit.ai
-        </p>
+        <Image
+          src="/logo.png"
+          alt="Trainify logo"
+          width={80}
+          height={25}
+          priority={true}
+        />
       </div>
 
       <div className="flex flex-col items-center gap-5 px-5 pt-5">

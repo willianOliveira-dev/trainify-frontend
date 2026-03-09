@@ -35,7 +35,6 @@ export function AiChatbot({ embedded = false, initialMessage }: ChatProps) {
       credentials: "include",
     }),
     onError: (error) => {
-      console.log(error);
       const isQuota =
         error?.message?.includes("quota") ||
         error?.message?.includes("exceeded") ||
@@ -202,6 +201,11 @@ export function AiChatbot({ embedded = false, initialMessage }: ChatProps) {
                             key={`${message.id}-part-${index}`}
                             isAnimating={isStreaming && isLastMessage}
                             className="font-tight text-sm leading-relaxed"
+                            components={{
+                              p: ({ children }) => (
+                                <span className="block mb-2">{children}</span>
+                              ),
+                            }}
                           >
                             {part.text}
                           </Streamdown>
