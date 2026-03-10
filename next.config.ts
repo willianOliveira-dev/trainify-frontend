@@ -20,7 +20,20 @@ const nextConfig: NextConfig = {
                 protocol: 'https',
                 hostname: 'i.ytimg.com',
             },
+            {
+                protocol: 'http',
+                hostname: 'localhost',
+                port: '8000',
+                pathname: '/static/**',
+            },
+            {
+                protocol: 'https',
+                hostname: 'sua-api.seudominio.com',
+                pathname: '/static/**',
+            },
         ],
+        dangerouslyAllowSVG: false,
+        unoptimized: true,
     },
 };
 
