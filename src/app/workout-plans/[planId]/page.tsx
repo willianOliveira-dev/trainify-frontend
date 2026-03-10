@@ -79,7 +79,7 @@ export default async function WorkoutPlanDetailsPage({ params }: PageProps) {
 
           <div className="flex flex-col gap-3">
             <div className="flex items-center">
-              <Badge className="bg-[#8585f9] hover:bg-[#8585f9]/90 text-white border-none gap-1.5 uppercase font-semibold text-[12px] px-3 py-1.5 rounded-full h-auto">
+              <Badge className="bg-primary hover:bg-primary/90 text-white border-none gap-1.5 uppercase font-semibold text-[12px] px-3 py-1.5 rounded-full h-auto">
                 <Target className="size-4" />
                 {name}
               </Badge>
