@@ -3,6 +3,7 @@ import { NavigationBar } from "@/components/navigation-bar";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { getHomeData, getMe } from "@/lib/api/fetch-generated";
 import { authClient } from "@/lib/auth-client";
+import { cn } from "@/lib/utils";
 import dayjs from "dayjs";
 import { BicepsFlexed, Ruler, User, Weight } from "lucide-react";
 import { headers } from "next/headers";
@@ -41,9 +42,20 @@ export default async function ProfilePage() {
   const bodyFatPercentage = data?.bodyFatPercentage ?? null;
   const age = data?.age ?? null;
 
+  const statItems = [
+    { icon: Weight, label: "Kg", value: weightInKg ?? "-" },
+    { icon: Ruler, label: "Cm", value: heightInCm ?? "-" },
+    {
+      icon: BicepsFlexed,
+      label: "Gc",
+      value: bodyFatPercentage != null ? `${bodyFatPercentage}%` : "-",
+    },
+    { icon: User, label: "Anos", value: age ?? "-" },
+  ];
+
   return (
-    <div className="flex min-h-svh flex-col bg-background pb-24">
-      <div className="flex h-[56px] items-center px-5">
+    <div className="flex min-h-svh flex-col bg-background md:ml-64">
+      <div className="flex h-[56px] items-center px-5 md:hidden">
         <Image
           src="/logo.png"
           alt="Trainify logo"
@@ -53,17 +65,22 @@ export default async function ProfilePage() {
         />
       </div>
 
-      <div className="flex flex-col items-center gap-5 px-5 pt-5">
+      <div
+        className={cn(
+          "flex flex-col items-center gap-5 px-5 pt-5 pb-28",
+          "md:mx-auto md:w-full md:max-w-xl md:px-8 md:pt-10 md:pb-10",
+        )}
+      >
         <div className="flex w-full items-center justify-between">
           <div className="flex items-center gap-3">
-            <Avatar className="size-[52px]">
+            <Avatar className="size-[52px] md:size-16">
               <AvatarImage src={user.image ?? undefined} alt={user.name} />
               <AvatarFallback className="text-lg">
                 {user.name?.charAt(0)?.toUpperCase()}
               </AvatarFallback>
             </Avatar>
             <div className="flex flex-col gap-1.5">
-              <h1 className="font-heading text-lg font-semibold leading-[1.05] text-foreground">
+              <h1 className="font-heading text-lg font-semibold leading-[1.05] text-foreground md:text-xl">
                 {user.name}
               </h1>
               <p className="font-heading text-sm leading-[1.15] text-foreground/70">
@@ -74,61 +91,24 @@ export default async function ProfilePage() {
         </div>
 
         <div className="grid w-full grid-cols-2 gap-3">
-          <div className="flex flex-col items-center gap-5 rounded-xl bg-primary/8 p-5">
-            <div className="flex items-center rounded-full bg-primary/8 p-[9px]">
-              <Weight className="size-4 text-primary" />
+          {statItems.map(({ icon: Icon, label, value }) => (
+            <div
+              key={label}
+              className="flex flex-col items-center gap-5 rounded-xl bg-primary/8 p-5"
+            >
+              <div className="flex items-center rounded-full bg-primary/8 p-[9px]">
+                <Icon className="size-4 text-primary" />
+              </div>
+              <div className="flex flex-col items-center gap-1.5">
+                <span className="font-heading text-2xl font-semibold leading-[1.15] text-foreground">
+                  {value}
+                </span>
+                <span className="font-heading text-xs uppercase leading-[1.4] text-muted-foreground">
+                  {label}
+                </span>
+              </div>
             </div>
-            <div className="flex flex-col items-center gap-1.5">
-              <span className="font-heading text-2xl font-semibold leading-[1.15] text-foreground">
-                {weightInKg ?? "-"}
-              </span>
-              <span className="font-heading text-xs uppercase leading-[1.4] text-muted-foreground">
-                Kg
-              </span>
-            </div>
-          </div>
-
-          <div className="flex flex-col items-center gap-5 rounded-xl bg-primary/8 p-5">
-            <div className="flex items-center rounded-full bg-primary/8 p-[9px]">
-              <Ruler className="size-4 text-primary" />
-            </div>
-            <div className="flex flex-col items-center gap-1.5">
-              <span className="font-heading text-2xl font-semibold leading-[1.15] text-foreground">
-                {heightInCm ?? "-"}
-              </span>
-              <span className="font-heading text-xs uppercase leading-[1.4] text-muted-foreground">
-                Cm
-              </span>
-            </div>
-          </div>
-
-          <div className="flex flex-col items-center gap-5 rounded-xl bg-primary/8 p-5">
-            <div className="flex items-center rounded-full bg-primary/8 p-[9px]">
-              <BicepsFlexed className="size-4 text-primary" />
-            </div>
-            <div className="flex flex-col items-center gap-1.5">
-              <span className="font-heading text-2xl font-semibold leading-[1.15] text-foreground">
-                {bodyFatPercentage != null ? `${bodyFatPercentage}%` : "-"}
-              </span>
-              <span className="font-heading text-xs uppercase leading-[1.4] text-muted-foreground">
-                Gc
-              </span>
-            </div>
-          </div>
-
-          <div className="flex flex-col items-center gap-5 rounded-xl bg-primary/8 p-5">
-            <div className="flex items-center rounded-full bg-primary/8 p-[9px]">
-              <User className="size-4 text-primary" />
-            </div>
-            <div className="flex flex-col items-center gap-1.5">
-              <span className="font-heading text-2xl font-semibold leading-[1.15] text-foreground">
-                {age ?? "-"}
-              </span>
-              <span className="font-heading text-xs uppercase leading-[1.4] text-muted-foreground">
-                Anos
-              </span>
-            </div>
-          </div>
+          ))}
         </div>
 
         <LogoutButton />

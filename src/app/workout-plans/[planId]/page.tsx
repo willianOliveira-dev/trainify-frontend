@@ -1,38 +1,32 @@
 import { NavigationBar } from "@/components/navigation-bar";
-import { Badge } from "@/components/ui/badge";
-import { WorkoutDayItem } from "@/components/workout-plan/workout-day-item";
-import { WEEKDAY_ORDER } from "@/constants/week-order.constant";
-import {
-  getHomeData,
-  getMe,
-  getWorkoutPlanDetailsdData,
-} from "@/lib/api/fetch-generated";
+import { ConsistencyHeatmap } from "@/components/stats/consistency-heatmap";
+import { StatCard } from "@/components/stats/stat-card";
+import { getHomeData, getMe, getStatsData } from "@/lib/api/fetch-generated";
 import { authClient } from "@/lib/auth-client";
+import { cn } from "@/lib/utils";
 import dayjs from "dayjs";
-import { Target } from "lucide-react";
 import { headers } from "next/headers";
 import Image from "next/image";
 import { redirect } from "next/navigation";
 
-interface PageProps {
-  params: Promise<{
-    planId: string;
-  }>;
-}
-
-export default async function WorkoutPlanDetailsPage({ params }: PageProps) {
+export default async function StatsPage() {
   const session = await authClient.getSession({
     fetchOptions: {
       headers: await headers(),
     },
   });
 
-  if (!session.data?.user) redirect("/auth");
+  if (!session?.data) {
+    redirect("/auth");
+  }
 
-  const { planId } = await params;
-  const [workoutPlanData, homeData, trainData] = await Promise.all([
-    getWorkoutPlanDetailsdData(planId),
-    getHomeData(dayjs().format("YYYY-MM-DD")),
+  const today = dayjs();
+  const from = today.subtract(2, "month").startOf("month").format("YYYY-MM-DD");
+  const to = today.endOf("month").format("YYYY-MM-DD");
+
+  const [statsResponse, homeData, trainData] = await Promise.all([
+    getStatsData({ from, to }),
+    getHomeData(today.format("YYYY-MM-DD")),
     getMe(),
   ]);
 
@@ -41,73 +35,122 @@ export default async function WorkoutPlanDetailsPage({ params }: PageProps) {
     (trainData.status === 200 && !trainData.data);
   if (needsOnboarding) redirect("/onboarding");
 
-  if (workoutPlanData.status !== 200) redirect("/");
+  if (statsResponse.status !== 200) {
+    throw new Error("Failed to fetch stats");
+  }
 
-  const { name, workoutDays } = workoutPlanData.data;
+  const {
+    workoutStreak,
+    consistencyByDay,
+    completedWorkoutsCount,
+    conclusionRate,
+    totalTimeInSeconds,
+  } = statsResponse.data;
 
-  const sortedDays = [...workoutDays].sort(
-    (a, b) =>
-      WEEKDAY_ORDER.indexOf(a.weekDay) - WEEKDAY_ORDER.indexOf(b.weekDay),
-  );
+  const formattedConclusionRate = `${Math.round(conclusionRate * 100)}%`;
+
+  const formatDuration = (seconds: number) => {
+    const hours = Math.floor(seconds / 3600);
+    const minutes = Math.floor((seconds % 3600) / 60);
+    return `${hours}h${minutes}m`;
+  };
+
+  const isStreakZero = workoutStreak === 0;
 
   return (
-    <div className="flex min-h-screen w-full max-w-md mx-auto flex-col bg-background text-foreground pb-24">
-      <div className="relative h-[296px] w-full overflow-hidden rounded-b-3xl shrink-0">
+    <div className="flex min-h-screen flex-col bg-background text-foreground md:ml-64">
+      <header className="flex h-14 items-center px-5 py-2.5 shrink-0 md:hidden">
         <Image
-          src="/plan-details-banner.png"
-          alt="Plan Banner"
-          fill
-          className="object-cover"
+          src="/logo.png"
+          alt="Trainify Logo"
+          width={95}
+          height={50}
+          className="object-contain"
           priority
         />
-        <div
-          className="absolute inset-0"
-          style={{
-            backgroundImage:
-              "linear-gradient(238.089deg, rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, 0.8) 100%)",
-          }}
-        />
+      </header>
 
-        <div className="absolute inset-0 flex flex-col justify-between p-5 pt-10">
-          <Image
-            src="/logo.png"
-            alt="Trainify Logo"
-            width={95}
-            height={50}
-            className="object-contain"
-          />
+      <main
+        className={cn(
+          "flex flex-col gap-6 px-5 py-4 pb-28",
+          "md:grid md:grid-cols-2 md:gap-8 md:px-8 md:py-8 md:pb-8 md:items-start",
+          "lg:max-w-5xl lg:px-10",
+        )}
+      >
+        <div className="flex flex-col gap-6">
+          <div
+            className={cn(
+              "relative overflow-hidden rounded-xl h-48 p-10 flex flex-col items-center justify-center text-center",
+              !isStreakZero ? "bg-primary" : "bg-card border border-border",
+            )}
+          >
+            <Image
+              src={
+                isStreakZero
+                  ? "/stats-banner-empty.png"
+                  : "/stats-banner-active.png"
+              }
+              alt="Streak Banner"
+              fill
+              className="object-cover transition-opacity duration-500"
+              priority
+            />
 
-          <div className="flex flex-col gap-3">
-            <div className="flex items-center">
-              <Badge className="bg-primary hover:bg-primary/90 text-white border-none gap-1.5 uppercase font-semibold text-[12px] px-3 py-1.5 rounded-full h-auto">
-                <Target className="size-4" />
-                {name}
-              </Badge>
+            <div className="relative z-10 flex flex-col items-center gap-3">
+              <div className="bg-white/10 border border-white/10 backdrop-blur-md p-3 rounded-full size-14 flex items-center justify-center">
+                <Image
+                  src={isStreakZero ? "/flame-white.svg" : "/flame-orange.svg"}
+                  alt="Streak"
+                  width={32}
+                  height={32}
+                  className="size-8"
+                />
+              </div>
+              <div className="flex flex-col gap-1 items-center justify-center text-white">
+                <p className="font-tight text-5xl font-semibold leading-none">
+                  {workoutStreak} {workoutStreak === 1 ? "dia" : "dias"}
+                </p>
+                <p className="font-tight text-base opacity-60">
+                  Sequência Atual
+                </p>
+              </div>
             </div>
-            <h1 className="font-tight text-white text-[24px] font-semibold leading-[1.05]">
-              Plano de Treino
-            </h1>
           </div>
-        </div>
-      </div>
 
-      <main className="flex flex-col gap-3 px-5 py-6">
-        {sortedDays.map((day) => (
-          <WorkoutDayItem
-            key={day.id}
-            id={day.id}
-            planId={planId}
-            name={day.name}
-            weekDay={day.weekDay}
-            isRest={day.isRest}
-            durationInSeconds={day.estimatedDurationInSeconds}
-            exercisesCount={day.exercisesCount}
-            coverImageUrl={day.coverImageUrl}
+          <section className="flex flex-col gap-3">
+            <h2 className="font-tight text-lg font-semibold md:text-xl">
+              Consistência
+            </h2>
+            <ConsistencyHeatmap consistencyByDay={consistencyByDay} />
+          </section>
+        </div>
+
+        <section className="grid grid-cols-2 gap-3 md:content-start">
+          <div className="col-span-2 hidden md:block">
+            <h2 className="font-tight text-lg font-semibold md:text-xl">
+              Resumo
+            </h2>
+          </div>
+          <StatCard
+            label="Treinos Feitos"
+            value={completedWorkoutsCount}
+            iconSrc="/circle-check.svg"
           />
-        ))}
+          <StatCard
+            label="Taxa de conclusão"
+            value={formattedConclusionRate}
+            iconSrc="/circle-percent.svg"
+          />
+          <StatCard
+            label="Tempo Total"
+            value={formatDuration(totalTimeInSeconds)}
+            iconSrc="/hourglass.svg"
+            className="col-span-2"
+          />
+        </section>
       </main>
 
-      <NavigationBar activePage="calendar" />
+      <NavigationBar activePage="stats" />
     </div>
   );
 }
