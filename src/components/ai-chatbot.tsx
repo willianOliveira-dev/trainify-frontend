@@ -124,7 +124,7 @@ export function AiChatbot({ embedded = false, initialMessage }: ChatProps) {
           </div>
           <div className="flex flex-col">
             <span className="font-tight text-base font-semibold text-foreground">
-              Trainify AI
+              IA Trainify
             </span>
             <div className="flex items-center gap-1.5">
               <div className="relative">
