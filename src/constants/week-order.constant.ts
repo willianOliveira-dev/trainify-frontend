@@ -1,5 +1,5 @@
 const WEEKDAY_ORDER = [
-    'mondy',
+    'monday',
     'tuesday',
     'wednesday',
     'thursday',

@@ -30,7 +30,7 @@ export function WorkoutDayItem({
 
   if (isRest) {
     return (
-      <div className="bg-[#f1f1f1] flex flex-col h-[110px] items-start justify-between p-5 relative rounded-xl shrink-0 w-full overflow-hidden">
+      <div className="bg-white flex flex-col h-[110px] items-start justify-between p-5 relative rounded-xl shrink-0 w-full overflow-hidden">
         <div className="flex items-center justify-center relative shrink-0">
           <Badge variant="secondary" className="bg-black/5 text-black border-none gap-1 uppercase font-semibold text-[10px] px-2.5 py-1.5 h-auto">
             <Calendar className="size-3.5" />

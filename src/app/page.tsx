@@ -21,6 +21,7 @@ export default async function Home() {
   if (!session.data?.user) redirect("/auth");
 
   const today = dayjs();
+  
   const [homeData, trainData] = await Promise.all([
     getHomeData(today.format("YYYY-MM-DD")),
     getMe(),
@@ -37,6 +38,7 @@ export default async function Home() {
 
   const { todayWorkoutDay, workoutStreak, consistencyByDay } = homeData.data;
   const userName = session.data.user.name?.split(" ")[0] ?? "";
+
 
   return (
     <div className="flex min-h-screen w-full max-w-md mx-auto flex-col bg-background text-foreground pb-24">

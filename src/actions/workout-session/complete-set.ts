@@ -1,7 +1,6 @@
-'use server';
+"use server";
 
-import { completeSet as completeSetApi } from '@/lib/api/fetch-generated';
-import { revalidatePath } from 'next/cache';
+import { completeSet as completeSetApi } from "@/lib/api/fetch-generated";
 
 export async function completeSet(
     planId: string,
@@ -11,10 +10,8 @@ export async function completeSet(
     setNumber: number,
     totalSetsInWorkout: number,
 ) {
-    const result = await completeSetApi(planId, dayId, sessionId, exerciseId, {
+    return await completeSetApi(planId, dayId, sessionId, exerciseId, {
         setNumber,
         totalSetsInWorkout,
     });
-    revalidatePath(`/workout-plans/${planId}/days/${dayId}`);
-    return result;
 }

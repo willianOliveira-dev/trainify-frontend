@@ -12,6 +12,7 @@ import {
   type GetSessionSets200Item,
 } from "@/lib/api/fetch-generated";
 import { authClient } from "@/lib/auth-client";
+import { WorkoutSessionProvider } from "@/providers/workout-session-provider";
 import dayjs from "dayjs";
 import utc from "dayjs/plugin/utc";
 import { Calendar, Dumbbell, Timer } from "lucide-react";
@@ -138,33 +139,39 @@ export default async function WorkoutDayDetailsPage({ params }: PageProps) {
           </div>
         </div>
 
-        <div className="flex flex-col gap-3">
-          {exercises.map((exercise) => (
-            <ExerciseItem
-              key={exercise.id}
-              name={exercise.name}
-              series={exercise.sets}
-              reps={exercise.reps}
-              restTimeInSeconds={exercise.restTimeInSeconds}
-              youtubeVideoId={exercise.youtubeVideoId}
-              exerciseId={exercise.id}
-              planId={planId}
-              dayId={dayId}
-              sessionId={activeSession?.id}
-              initialCompletedSets={completedSetsData
-                .filter((s) => s.exerciseId === exercise.id)
-                .map((s) => s.setNumber)}
-              totalSetsInWorkout={totalSetsInWorkout}
-            />
-          ))}
-        </div>
+        <WorkoutSessionProvider
+          initialCompletedSetsCount={completedSetsData.length}
+          totalSetsInWorkout={totalSetsInWorkout}
+        >
+          <div className="flex flex-col gap-3">
+            {exercises.map((exercise) => (
+              <ExerciseItem
+                key={exercise.id}
+                name={exercise.name}
+                series={exercise.sets}
+                reps={exercise.reps}
+                restTimeInSeconds={exercise.restTimeInSeconds}
+                youtubeVideoId={exercise.youtubeVideoId}
+                exerciseId={exercise.id}
+                planId={planId}
+                dayId={dayId}
+                sessionId={activeSession?.id}
+                initialCompletedSets={completedSetsData
+                  .filter((s) => s.exerciseId === exercise.id)
+                  .map((s) => s.setNumber)}
+                totalSetsInWorkout={totalSetsInWorkout}
+              />
+            ))}
+          </div>
 
-        <WorkoutActions
-          planId={planId}
-          dayId={dayId}
-          activeSessionId={activeSession?.id}
-          isCompleted={isCompleted}
-        />
+          <WorkoutActions
+            planId={planId}
+            dayId={dayId}
+            activeSessionId={activeSession?.id}
+            isCompleted={isCompleted}
+            weekDay={weekDay}
+          />
+        </WorkoutSessionProvider>
       </main>
 
       <NavigationBar />

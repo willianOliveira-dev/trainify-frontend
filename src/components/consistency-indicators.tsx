@@ -1,5 +1,9 @@
 import { cn } from "@/lib/utils";
+import dayjs from "dayjs";
+import "dayjs/locale/pt-br";
 import Image from "next/image";
+
+dayjs.locale("pt-br");
 
 interface ConsistencyIndicatorsProps {
   streak: number;
@@ -13,16 +17,14 @@ export function ConsistencyIndicators({
   streak,
   consistencyByDay,
 }: ConsistencyIndicatorsProps) {
-  const daysOfWeek = ["D", "S", "T", "Q", "Q", "S", "S"];
-
   const sortedDates = Object.keys(consistencyByDay).sort();
 
   return (
     <div className="flex gap-3 w-full items-center justify-center">
       <div className="flex flex-1 items-center justify-between border border-border p-5 rounded-xl">
-        {daysOfWeek.map((day, index) => {
-          const date = sortedDates[index];
-          const data = date ? consistencyByDay[date] : null;
+        {sortedDates.map((date) => {
+          const data = consistencyByDay[date];
+          const dayLabel = dayjs(date).format("ddd").charAt(0).toUpperCase();
 
           let bgColor = "bg-white border border-border";
           if (data?.workoutDayCompleted) {
@@ -32,15 +34,12 @@ export function ConsistencyIndicators({
           }
 
           return (
-            <div
-              key={date || `empty-${index}`}
-              className="flex flex-col items-center gap-2"
-            >
+            <div key={date} className="flex flex-col items-center gap-2">
               <div
                 className={cn("size-5 rounded-md transition-colors", bgColor)}
               />
               <span className="text-xs text-muted-foreground font-medium">
-                {day}
+                {dayLabel}
               </span>
             </div>
           );

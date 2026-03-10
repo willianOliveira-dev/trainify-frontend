@@ -4,9 +4,19 @@ import { completeSet } from "@/actions/workout-session/complete-set";
 import { undoSet } from "@/actions/workout-session/undo-set";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Check, HelpCircle, Pause, PlayCircle, X, Zap } from "lucide-react";
+import { useWorkoutSession } from "@/hooks/use-workout-session";
+import {
+  Check,
+  HelpCircle,
+  Pause,
+  Play,
+  PlayCircle,
+  SkipForward,
+  X,
+  Zap,
+} from "lucide-react";
 import { parseAsBoolean, parseAsString, useQueryState } from "nuqs";
-import { useEffect, useState, useCallback, useRef } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 
 interface ExerciseItemProps {
   name: string;
@@ -20,22 +30,13 @@ interface ExerciseItemProps {
   sessionId?: string;
   initialCompletedSets?: number[];
   totalSetsInWorkout: number;
-  onSetsChange?: (completedCount: number) => void;
-}
-
-interface TimerState {
-  timeRemaining: number;
-  isPaused: boolean;
 }
 
 const formatTime = (seconds: number): string => {
   if (seconds >= 60) {
-    const minutes = Math.floor(seconds / 60);
-    const remainingSeconds = seconds % 60;
-    if (remainingSeconds > 0) {
-      return `${minutes}min ${remainingSeconds}s`;
-    }
-    return `${minutes}min`;
+    const m = Math.floor(seconds / 60);
+    const s = seconds % 60;
+    return s > 0 ? `${m}min ${s}s` : `${m}min`;
   }
   return `${seconds}s`;
 };
@@ -52,55 +53,75 @@ export function ExerciseItem({
   sessionId,
   initialCompletedSets = [],
   totalSetsInWorkout,
-  onSetsChange,
 }: ExerciseItemProps) {
-  const [completedSets, setCompletedSets] = useState<number[]>(initialCompletedSets);
-  const [timerState, setTimerState] = useState<TimerState | null>(null);
+  const [completedSets, setCompletedSets] =
+    useState<number[]>(initialCompletedSets);
+  const [timer, setTimer] = useState<number | null>(null);
+  const [paused, setPaused] = useState(false);
   const [showPlayer, setShowPlayer] = useState(false);
-  
-  const timerIntervalRef = useRef<NodeJS.Timeout | null>(null);
+  const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
-  const [, setIsChatOpen] = useQueryState("chat_open", parseAsBoolean.withDefault(false));
-  const [, setInitialMessage] = useQueryState("chat_initial_message", parseAsString);
+  const { incrementSets, decrementSets } = useWorkoutSession();
 
-  useEffect(() => {
-    onSetsChange?.(completedSets.length);
-  }, [completedSets, onSetsChange]);
+  const [, setIsChatOpen] = useQueryState(
+    "chat_open",
+    parseAsBoolean.withDefault(false),
+  );
+  const [, setInitialMessage] = useQueryState(
+    "chat_initial_message",
+    parseAsString,
+  );
 
-  const clearTimerInterval = useCallback(() => {
-    if (timerIntervalRef.current) {
-      clearInterval(timerIntervalRef.current);
-      timerIntervalRef.current = null;
+  const clearTimer = useCallback(() => {
+    if (intervalRef.current !== null) {
+      clearInterval(intervalRef.current);
+      intervalRef.current = null;
     }
+    setTimer(null);
+    setPaused(false);
   }, []);
 
-  const startTimer = useCallback((initialTime: number) => {
-    clearTimerInterval();
-    
-    setTimerState({
-      timeRemaining: initialTime,
-      isPaused: false
-    });
-
-    timerIntervalRef.current = setInterval(() => {
-      setTimerState((prev) => {
-        if (!prev || prev.isPaused) return prev;
-        
-        const newTime = prev.timeRemaining - 1;
-        
-        if (newTime <= 0) {
-          clearTimerInterval();
+  const startInterval = useCallback(() => {
+    intervalRef.current = setInterval(() => {
+      setTimer((prev) => {
+        if (prev === null || prev <= 1) {
+          if (intervalRef.current !== null) {
+            clearInterval(intervalRef.current);
+            intervalRef.current = null;
+          }
           return null;
         }
-        
-        return { ...prev, timeRemaining: newTime };
+        return prev - 1;
       });
     }, 1000);
-  }, [clearTimerInterval]);
+  }, []);
+
+  const startTimer = useCallback(
+    (seconds: number) => {
+      clearTimer();
+      setTimer(seconds);
+      setPaused(false);
+      startInterval();
+    },
+    [clearTimer, startInterval],
+  );
+
+  const handleTogglePause = useCallback(() => {
+    if (!paused) {
+      if (intervalRef.current !== null) {
+        clearInterval(intervalRef.current);
+        intervalRef.current = null;
+      }
+      setPaused(true);
+    } else {
+      setPaused(false);
+      startInterval();
+    }
+  }, [paused, startInterval]);
 
   useEffect(() => {
-    return () => clearTimerInterval();
-  }, [clearTimerInterval]);
+    return () => clearTimer();
+  }, [clearTimer]);
 
   const handleSetClick = async (setNumber: number) => {
     if (!sessionId) return;
@@ -109,20 +130,16 @@ export function ExerciseItem({
 
     if (isCompleted) {
       setCompletedSets((prev) => prev.filter((s) => s !== setNumber));
+      clearTimer();
+      decrementSets();
       await undoSet(planId, dayId, sessionId, exerciseId, setNumber);
-      
-      clearTimerInterval();
-      setTimerState(null);
     } else {
-      setCompletedSets((prev) => [...prev, setNumber]);
-      
-      if (completedSets.length + 1 < series) {
+      const newCompleted = [...completedSets, setNumber];
+      setCompletedSets(newCompleted);
+      incrementSets();
+      if (newCompleted.length < series) {
         startTimer(restTimeInSeconds);
-      } else {
-        clearTimerInterval();
-        setTimerState(null);
       }
-      
       await completeSet(
         planId,
         dayId,
@@ -134,51 +151,54 @@ export function ExerciseItem({
     }
   };
 
-  const handleTogglePause = () => {
-    setTimerState((prev) => 
-      prev ? { ...prev, isPaused: !prev.isPaused } : null
-    );
-  };
-
-  const handleSkipTimer = () => {
-    clearTimerInterval();
-    setTimerState(null);
-  };
-
-  const handleAskHelp = () => {
-    setInitialMessage(`Como executar o exercício ${name} corretamente?`);
-    setIsChatOpen(true);
-  };
-
-  // const isAllSetsCompleted = completedSets.length === series;
+  const allSetsCompleted = completedSets.length === series;
 
   return (
-    <div className="flex flex-col overflow-hidden rounded-xl border border-muted bg-card">
+    <div
+      className={`flex flex-col overflow-hidden rounded-xl border bg-card transition-colors duration-300 ${
+        allSetsCompleted ? "border-primary/40" : "border-muted"
+      }`}
+    >
       <div className="flex flex-col gap-3 p-5">
         <div className="flex items-center justify-between">
-          <h3 className="font-tight text-base font-semibold text-foreground">
-            {name}
-          </h3>
-          
           <div className="flex items-center gap-2">
+            <h3 className="font-tight text-base font-semibold text-foreground">
+              {name}
+            </h3>
+            {allSetsCompleted && (
+              <span className="flex h-5 w-5 items-center justify-center rounded-full bg-primary">
+                <Check className="size-3 text-primary-foreground" />
+              </span>
+            )}
+          </div>
+
+          <div className="flex items-center gap-1">
             {youtubeVideoId && (
               <Button
                 variant="ghost"
                 size="icon"
                 onClick={() => setShowPlayer((p) => !p)}
-                className="text-primary transition-all hover:text-primary/80"
-                aria-label={showPlayer ? "Fechar vídeo" : "Abrir vídeo"}
+                className="text-primary hover:text-primary/80"
+                aria-label={showPlayer ? "Fechar vídeo" : "Ver vídeo"}
               >
-                {showPlayer ? <X className="size-5" /> : <PlayCircle className="size-5" />}
+                {showPlayer ? (
+                  <X className="size-5" />
+                ) : (
+                  <PlayCircle className="size-5" />
+                )}
               </Button>
             )}
-            
             <Button
               variant="ghost"
               size="icon"
-              onClick={handleAskHelp}
-              className="text-muted-foreground transition-all hover:text-foreground"
-              aria-label="Ajuda com o exercício"
+              onClick={() => {
+                setInitialMessage(
+                  `Como executar o exercício ${name} corretamente?`,
+                );
+                setIsChatOpen(true);
+              }}
+              className="text-muted-foreground hover:text-foreground"
+              aria-label="Como executar"
             >
               <HelpCircle className="size-5" />
             </Button>
@@ -192,7 +212,6 @@ export function ExerciseItem({
           >
             {reps} reps
           </Badge>
-          
           <Badge
             variant="secondary"
             className="h-[22px] gap-1 border-none bg-muted px-2.5 text-[10px] font-semibold uppercase text-muted-foreground"
@@ -200,67 +219,75 @@ export function ExerciseItem({
             <Zap className="size-3" />
             {restTimeInSeconds}s
           </Badge>
-
-          <Badge
-            variant="secondary"
-            className="h-[22px] border-none bg-primary/10 px-2.5 text-[10px] font-semibold uppercase text-primary"
-          >
-            {completedSets.length}/{series}
-          </Badge>
+          {sessionId && (
+            <Badge
+              variant="secondary"
+              className={`h-[22px] border-none px-2.5 text-[10px] font-semibold uppercase transition-colors ${
+                allSetsCompleted
+                  ? "bg-primary/15 text-primary"
+                  : "bg-muted text-muted-foreground"
+              }`}
+            >
+              {completedSets.length}/{series}
+            </Badge>
+          )}
         </div>
 
         {sessionId && (
           <div className="flex flex-wrap gap-2">
-            {Array.from({ length: series }, (_, i) => i + 1).map((setNumber) => {
-              const isCompleted = completedSets.includes(setNumber);
-              
-              return (
-                <Button
-                  key={setNumber}
-                  variant="ghost"
-                  size="icon"
-                  onClick={() => handleSetClick(setNumber)}
-                  className={`h-9 w-9 rounded-full border text-xs font-semibold transition-all duration-200 ${
-                    isCompleted
-                      ? "scale-95 border-primary bg-primary text-primary-foreground"
-                      : "border-muted text-muted-foreground hover:border-primary hover:text-primary"
-                  }`}
-                  aria-label={`Série ${setNumber} ${isCompleted ? "concluída" : "pendente"}`}
-                >
-                  {isCompleted ? <Check className="size-4" /> : setNumber}
-                </Button>
-              );
-            })}
+            {Array.from({ length: series }, (_, i) => i + 1).map(
+              (setNumber) => {
+                const isCompleted = completedSets.includes(setNumber);
+                return (
+                  <Button
+                    key={setNumber}
+                    variant="ghost"
+                    size="icon"
+                    onClick={() => handleSetClick(setNumber)}
+                    className={`h-9 w-9 rounded-full border text-xs font-semibold transition-all duration-200 ${
+                      isCompleted
+                        ? "scale-95 border-primary bg-primary text-primary-foreground hover:bg-primary/90 hover:text-primary-foreground"
+                        : "border-muted text-muted-foreground hover:border-primary hover:bg-transparent hover:text-primary"
+                    }`}
+                    aria-label={`Série ${setNumber}`}
+                  >
+                    {isCompleted ? <Check className="size-4" /> : setNumber}
+                  </Button>
+                );
+              },
+            )}
           </div>
         )}
 
-        {timerState && timerState.timeRemaining > 0 && (
+        {timer !== null && (
           <div className="flex items-center gap-2 rounded-lg bg-primary/10 px-3 py-2">
-            <Zap className="size-4 animate-pulse text-primary" />
-            
+            <Zap
+              className={`size-4 shrink-0 text-primary ${!paused && "animate-pulse"}`}
+            />
             <span className="font-tight text-sm font-semibold text-primary">
-              Descansando: {formatTime(timerState.timeRemaining)}
+              {paused ? "Pausado:" : "Descansando:"} {formatTime(timer)}
             </span>
-
-            <div className="ml-auto flex gap-1">
+            <div className="ml-auto flex items-center gap-1">
               <Button
                 variant="ghost"
                 size="sm"
                 onClick={handleTogglePause}
-                className="h-7 text-xs text-muted-foreground hover:text-foreground"
-                aria-label={timerState.isPaused ? "Retomar" : "Pausar"}
+                className="h-7 gap-1 text-xs text-muted-foreground hover:text-foreground"
               >
-                {timerState.isPaused ? <PlayCircle className="mr-1 size-4" /> : <Pause className="mr-1 size-4" />}
-                {timerState.isPaused ? "Retomar" : "Pausar"}
+                {paused ? (
+                  <Play className="size-3.5" />
+                ) : (
+                  <Pause className="size-3.5" />
+                )}
+                {paused ? "Retomar" : "Pausar"}
               </Button>
-
               <Button
                 variant="ghost"
                 size="sm"
-                onClick={handleSkipTimer}
-                className="h-7 text-xs text-muted-foreground hover:text-foreground"
-                aria-label="Pular descanso"
+                onClick={clearTimer}
+                className="h-7 gap-1 text-xs text-muted-foreground hover:text-foreground"
               >
+                <SkipForward className="size-3.5" />
                 Pular
               </Button>
             </div>
@@ -268,7 +295,6 @@ export function ExerciseItem({
         )}
       </div>
 
-      {/* YouTube Player */}
       {showPlayer && youtubeVideoId && (
         <div className="aspect-video w-full">
           <iframe
