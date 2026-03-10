@@ -14,7 +14,7 @@ interface WorkoutDayCardProps {
   durationInSeconds: number;
   exercisesCount: number;
   weekDay: keyof typeof WEEK_DAY_MAP;
-  coverImageUrl?: string;
+  coverImageUrl?: string | null
   isRest?: boolean;
 }
 

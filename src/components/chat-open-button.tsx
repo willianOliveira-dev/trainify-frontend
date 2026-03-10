@@ -13,9 +13,15 @@ export function ChatOpenButton() {
   return (
     <Button
       onClick={() => setChatParams({ chat_open: true })}
-      className="rounded-full bg-primary p-4"
+      size="icon"
+      className="size-14 aspect-square rounded-full
+        shadow-[0_0_0_4px_hsl(var(--primary)/0.15),0_8px_32px_hsl(var(--primary)/0.35)]
+        hover:shadow-[0_0_0_6px_hsl(var(--primary)/0.2),0_12px_40px_hsl(var(--primary)/0.45)]
+        transition-all duration-300 ease-out
+        hover:scale-110 active:scale-95"
+      aria-label="Abrir chat"
     >
-      <Sparkles className="size-6 text-primary-foreground" />
+      <Sparkles className="size-5" />
     </Button>
   );
 }

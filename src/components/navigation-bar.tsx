@@ -10,7 +10,9 @@ interface NavigationBarProps {
   activePage?: "home" | "calendar" | "stats" | "profile";
 }
 
-export async function NavigationBar({ activePage = "home" }: NavigationBarProps) {
+export async function NavigationBar({
+  activePage = "home",
+}: NavigationBarProps) {
   const today = dayjs();
   const homeData = await getHomeData(today.format("YYYY-MM-DD"));
 
@@ -52,7 +54,9 @@ export async function NavigationBar({ activePage = "home" }: NavigationBarProps)
           />
         </Button>
       )}
-      <ChatOpenButton />
+      <div className="flex items-center justify-center size-14">
+        <ChatOpenButton />
+      </div>
       <Link href="/stats" className="p-3">
         <ChartNoAxesColumn
           className={cn(

@@ -37,7 +37,7 @@ export default async function Home() {
 
   const { todayWorkoutDay, workoutStreak, consistencyByDay } = homeData.data;
   const userName = session.data.user.name?.split(" ")[0] ?? "";
-  console.log(homeData.data)
+
   return (
     <div className="flex min-h-screen w-full max-w-md mx-auto flex-col bg-background text-foreground pb-24">
       <div className="relative h-72 w-full overflow-hidden rounded-b-3xl">
@@ -90,7 +90,7 @@ export default async function Home() {
           </div>
           <ConsistencyIndicators
             streak={workoutStreak}
-            consistencyByDay={consistencyByDay}
+            consistencyByDay={consistencyByDay ?? {}}
           />
         </div>
 

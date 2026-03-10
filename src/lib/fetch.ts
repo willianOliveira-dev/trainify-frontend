@@ -1,6 +1,17 @@
 import { cookies } from "next/headers";
 
-const getBody = <T>(c: Response | Request): Promise<T> => {
+const getBody = async <T>(c: Response): Promise<T | null> => {
+  const contentLength = c.headers.get("content-length");
+  const contentType = c.headers.get("content-type");
+
+  if (
+    c.status === 204 ||
+    contentLength === "0" ||
+    !contentType?.includes("application/json")
+  ) {
+    return null;
+  }
+
   return c.json() as Promise<T>;
 };
 

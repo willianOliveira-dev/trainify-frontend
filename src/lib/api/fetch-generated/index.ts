@@ -149,6 +149,7 @@ export type CreateWorkoutPlanDataBodyWorkoutDaysItemExercisesItem = {
   name: string;
   /** @minimum 0 */
   order: number;
+  youtubeVideoId?: string | null;
   /** @minimum 1 */
   sets: number;
   /** @minimum 1 */
@@ -166,7 +167,7 @@ export type CreateWorkoutPlanDataBodyWorkoutDaysItem = {
   weekDay: CreateWorkoutPlanDataBodyWorkoutDaysItemWeekDay;
   isRest?: boolean;
   coverImageUrl?: string | "";
-  /** @minimum 1 */
+  /** @minimum 0 */
   estimatedDurationInSeconds: number;
   exercises: CreateWorkoutPlanDataBodyWorkoutDaysItemExercisesItem[];
 };
@@ -207,6 +208,7 @@ export type CreateWorkoutPlanData201WorkoutDaysItemExercisesItem = {
   name: string;
   /** @minimum 0 */
   order: number;
+  youtubeVideoId?: string | null;
   /** @minimum 1 */
   sets: number;
   /** @minimum 1 */
@@ -229,7 +231,7 @@ export type CreateWorkoutPlanData201WorkoutDaysItem = {
   weekDay: CreateWorkoutPlanData201WorkoutDaysItemWeekDay;
   isRest: boolean;
   coverImageUrl?: string;
-  /** @minimum 1 */
+  /** @minimum 0 */
   estimatedDurationInSeconds: number;
   exercises: CreateWorkoutPlanData201WorkoutDaysItemExercisesItem[];
 };
@@ -322,6 +324,7 @@ export type GetAllWorkoutPlansData200ItemWorkoutDaysItemExercisesItem = {
   name: string;
   /** @minimum 0 */
   order: number;
+  youtubeVideoId?: string | null;
   /** @minimum 1 */
   sets: number;
   /** @minimum 1 */
@@ -344,7 +347,7 @@ export type GetAllWorkoutPlansData200ItemWorkoutDaysItem = {
   weekDay: GetAllWorkoutPlansData200ItemWorkoutDaysItemWeekDay;
   isRest: boolean;
   coverImageUrl?: string;
-  /** @minimum 1 */
+  /** @minimum 0 */
   estimatedDurationInSeconds: number;
   exercises: GetAllWorkoutPlansData200ItemWorkoutDaysItemExercisesItem[];
 };
@@ -462,6 +465,7 @@ export type GetWorkoutPlanDayDetailsData200ExercisesItem = {
   sets: number;
   reps: number;
   restTimeInSeconds: number;
+  youtubeVideoId: string | null;
   order: number;
   workoutDayId: string;
 };
@@ -514,43 +518,193 @@ export type GetWorkoutPlanDayDetailsData500 = {
   message: string;
 };
 
-export type GetHomeData200TodayWorkoutDayWeekDay =
-  (typeof GetHomeData200TodayWorkoutDayWeekDay)[keyof typeof GetHomeData200TodayWorkoutDayWeekDay];
+export type GetSessionSets200Item = {
+  id: string;
+  sessionId: string;
+  exerciseId: string;
+  setNumber: number;
+  completedAt: string;
+};
 
-export const GetHomeData200TodayWorkoutDayWeekDay = {
-  monday: "monday",
-  tuesday: "tuesday",
-  wednesday: "wednesday",
-  thursday: "thursday",
-  friday: "friday",
-  saturday: "saturday",
-  sunday: "sunday",
-} as const;
+/**
+ * Sessão inválida ou ausente
+ */
+export type GetSessionSets401 = {
+  statusCode: number;
+  code: string;
+  message: string;
+};
+
+/**
+ * Sessão não encontrada
+ */
+export type GetSessionSets404 = {
+  statusCode: number;
+  code: string;
+  message: string;
+};
+
+/**
+ * Erro interno do servidor
+ */
+export type GetSessionSets500 = {
+  statusCode: number;
+  code: string;
+  message: string;
+};
+
+export type CompleteSetBody = {
+  /**
+   * @minimum 1
+   * @maximum 9007199254740991
+   */
+  setNumber: number;
+  /**
+   * @minimum 1
+   * @maximum 9007199254740991
+   */
+  totalSetsInWorkout: number;
+};
+
+export type CompleteSet200Set = {
+  id: string;
+  sessionId: string;
+  exerciseId: string;
+  setNumber: number;
+  completedAt: string;
+};
+
+/**
+ * Série concluída com sucesso
+ */
+export type CompleteSet200 = {
+  set: CompleteSet200Set;
+  autoCompleted: boolean;
+};
+
+export type CompleteSet400IssuesItem = {
+  field: string;
+  message: string;
+};
+
+/**
+ * Dados inválidos
+ */
+export type CompleteSet400 = {
+  statusCode: number;
+  code: string;
+  message: string;
+  issues: CompleteSet400IssuesItem[];
+};
+
+/**
+ * Sessão inválida ou ausente
+ */
+export type CompleteSet401 = {
+  statusCode: number;
+  code: string;
+  message: string;
+};
+
+/**
+ * Sessão de treino não encontrada
+ */
+export type CompleteSet404 = {
+  statusCode: number;
+  code: string;
+  message: string;
+};
+
+/**
+ * Erro interno do servidor
+ */
+export type CompleteSet500 = {
+  statusCode: number;
+  code: string;
+  message: string;
+};
+
+export type UndoSetBody = {
+  /**
+   * @minimum 1
+   * @maximum 9007199254740991
+   */
+  setNumber: number;
+};
+
+export type UndoSet400IssuesItem = {
+  field: string;
+  message: string;
+};
+
+/**
+ * Dados inválidos
+ */
+export type UndoSet400 = {
+  statusCode: number;
+  code: string;
+  message: string;
+  issues: UndoSet400IssuesItem[];
+};
+
+/**
+ * Sessão inválida ou ausente
+ */
+export type UndoSet401 = {
+  statusCode: number;
+  code: string;
+  message: string;
+};
+
+/**
+ * Sessão de treino não encontrada
+ */
+export type UndoSet404 = {
+  statusCode: number;
+  code: string;
+  message: string;
+};
+
+/**
+ * Erro interno do servidor
+ */
+export type UndoSet500 = {
+  statusCode: number;
+  code: string;
+  message: string;
+};
 
 export type GetHomeData200TodayWorkoutDay = {
   workoutPlanId: string;
   id: string;
   name: string;
   isRest: boolean;
-  weekDay: GetHomeData200TodayWorkoutDayWeekDay;
+  weekDay:
+    | "monday"
+    | "tuesday"
+    | "wednesday"
+    | "thursday"
+    | "friday"
+    | "saturday"
+    | "sunday";
   estimatedDurationInSeconds: number;
-  coverImageUrl?: string;
+  coverImageUrl: string | null;
   exercisesCount: number;
-};
+} | null;
 
 export type GetHomeData200ConsistencyByDay = {
   [key: string]: {
     workoutDayCompleted: boolean;
     workoutDayStarted: boolean;
   };
-};
+} | null;
 
 /**
  * Dados da tela Home carregados com sucesso
  */
 export type GetHomeData200 = {
   activeWorkoutPlanId: string;
-  todayWorkoutDay?: GetHomeData200TodayWorkoutDay;
+  todayWorkoutDay: GetHomeData200TodayWorkoutDay;
   workoutStreak: number;
   consistencyByDay: GetHomeData200ConsistencyByDay;
 };
@@ -642,11 +796,17 @@ export type GetStatsData500 = {
  * Dados de treino do usuário
  */
 export type GetMe200 = {
+  /** ID do usuário */
   userId: string;
+  /** Nome do usuário */
   userName: string;
+  /** Peso do usuário em gramas */
   weightInGrams: number;
+  /** Altura do usuário em centímetros */
   heightInCentimeters: number;
+  /** Idade do usuário em anos */
   age: number;
+  /** Percentual de gordura corporal (0 a 1) */
   bodyFatPercentage: number;
 } | null;
 
@@ -668,23 +828,30 @@ export type GetMe500 = {
   message: string;
 };
 
+/**
+ * Dados de treino do usuário
+ */
 export type UpsertTrainDataBody = {
   /**
+   * Peso do usuário em gramas
    * @maximum 9007199254740991
    * @exclusiveMinimum 0
    */
   weightInGrams: number;
   /**
+   * Altura do usuário em centímetros
    * @maximum 9007199254740991
    * @exclusiveMinimum 0
    */
   heightInCentimeters: number;
   /**
+   * Idade do usuário em anos
    * @minimum 1
    * @maximum 120
    */
   age: number;
   /**
+   * Percentual de gordura corporal (0 a 1, onde 1 = 100%)
    * @minimum 0
    * @maximum 1
    */
@@ -695,11 +862,17 @@ export type UpsertTrainDataBody = {
  * Dados de treino salvos com sucesso
  */
 export type UpsertTrainData200 = {
+  /** ID do usuário */
   userId: string;
+  /** Nome do usuário */
   userName: string;
+  /** Peso do usuário em gramas */
   weightInGrams: number;
+  /** Altura do usuário em centímetros */
   heightInCentimeters: number;
+  /** Idade do usuário em anos */
   age: number;
+  /** Percentual de gordura corporal (0 a 1) */
   bodyFatPercentage: number;
 } | null;
 
@@ -744,54 +917,20 @@ export const ChatBodyMessagesItemRole = {
   assistant: "assistant",
 } as const;
 
+export type ChatBodyMessagesItemPartsItem = {
+  type: string;
+  text?: string;
+  [key: string]: unknown;
+};
+
 export type ChatBodyMessagesItem = {
+  id: string;
   role: ChatBodyMessagesItemRole;
-  content: string;
+  parts: ChatBodyMessagesItemPartsItem[];
 };
 
 export type ChatBody = {
-  /** @minItems 1 */
   messages: ChatBodyMessagesItem[];
-};
-
-/**
- * Resposta da IA
- */
-export type Chat201 = {
-  text: string;
-};
-
-export type Chat400IssuesItem = {
-  field: string;
-  message: string;
-};
-
-/**
- * Dados inválidos
- */
-export type Chat400 = {
-  statusCode: number;
-  code: string;
-  message: string;
-  issues: Chat400IssuesItem[];
-};
-
-/**
- * Sessão inválida ou ausente
- */
-export type Chat401 = {
-  statusCode: number;
-  code: string;
-  message: string;
-};
-
-/**
- * Erro interno do servidor
- */
-export type Chat500 = {
-  statusCode: number;
-  code: string;
-  message: string;
 };
 
 /**
@@ -1159,6 +1298,209 @@ export const getWorkoutPlanDayDetailsData = async (
 };
 
 /**
+ * @summary Retorna as séries concluídas de uma sessão
+ */
+export type getSessionSetsResponse200 = {
+  data: GetSessionSets200Item[];
+  status: 200;
+};
+
+export type getSessionSetsResponse401 = {
+  data: GetSessionSets401;
+  status: 401;
+};
+
+export type getSessionSetsResponse404 = {
+  data: GetSessionSets404;
+  status: 404;
+};
+
+export type getSessionSetsResponse500 = {
+  data: GetSessionSets500;
+  status: 500;
+};
+
+export type getSessionSetsResponseSuccess = getSessionSetsResponse200 & {
+  headers: Headers;
+};
+export type getSessionSetsResponseError = (
+  | getSessionSetsResponse401
+  | getSessionSetsResponse404
+  | getSessionSetsResponse500
+) & {
+  headers: Headers;
+};
+
+export type getSessionSetsResponse =
+  | getSessionSetsResponseSuccess
+  | getSessionSetsResponseError;
+
+export const getGetSessionSetsUrl = (
+  id: string,
+  dayId: string,
+  sessionId: string,
+) => {
+  return `/trainify/api/v1/workout-plans/${id}/days/${dayId}/sessions/${sessionId}/sets`;
+};
+
+export const getSessionSets = async (
+  id: string,
+  dayId: string,
+  sessionId: string,
+  options?: RequestInit,
+): Promise<getSessionSetsResponse> => {
+  return customFetch<getSessionSetsResponse>(
+    getGetSessionSetsUrl(id, dayId, sessionId),
+    {
+      ...options,
+      method: "GET",
+    },
+  );
+};
+
+/**
+ * @summary Marca uma série como concluída
+ */
+export type completeSetResponse200 = {
+  data: CompleteSet200;
+  status: 200;
+};
+
+export type completeSetResponse400 = {
+  data: CompleteSet400;
+  status: 400;
+};
+
+export type completeSetResponse401 = {
+  data: CompleteSet401;
+  status: 401;
+};
+
+export type completeSetResponse404 = {
+  data: CompleteSet404;
+  status: 404;
+};
+
+export type completeSetResponse500 = {
+  data: CompleteSet500;
+  status: 500;
+};
+
+export type completeSetResponseSuccess = completeSetResponse200 & {
+  headers: Headers;
+};
+export type completeSetResponseError = (
+  | completeSetResponse400
+  | completeSetResponse401
+  | completeSetResponse404
+  | completeSetResponse500
+) & {
+  headers: Headers;
+};
+
+export type completeSetResponse =
+  | completeSetResponseSuccess
+  | completeSetResponseError;
+
+export const getCompleteSetUrl = (
+  id: string,
+  dayId: string,
+  sessionId: string,
+  exerciseId: string,
+) => {
+  return `/trainify/api/v1/workout-plans/${id}/days/${dayId}/sessions/${sessionId}/exercises/${exerciseId}/sets`;
+};
+
+export const completeSet = async (
+  id: string,
+  dayId: string,
+  sessionId: string,
+  exerciseId: string,
+  completeSetBody: CompleteSetBody,
+  options?: RequestInit,
+): Promise<completeSetResponse> => {
+  return customFetch<completeSetResponse>(
+    getCompleteSetUrl(id, dayId, sessionId, exerciseId),
+    {
+      ...options,
+      method: "POST",
+      headers: { "Content-Type": "application/json", ...options?.headers },
+      body: JSON.stringify(completeSetBody),
+    },
+  );
+};
+
+/**
+ * @summary Desmarca uma série concluída
+ */
+export type undoSetResponse204 = {
+  data: unknown;
+  status: 204;
+};
+
+export type undoSetResponse400 = {
+  data: UndoSet400;
+  status: 400;
+};
+
+export type undoSetResponse401 = {
+  data: UndoSet401;
+  status: 401;
+};
+
+export type undoSetResponse404 = {
+  data: UndoSet404;
+  status: 404;
+};
+
+export type undoSetResponse500 = {
+  data: UndoSet500;
+  status: 500;
+};
+
+export type undoSetResponseSuccess = undoSetResponse204 & {
+  headers: Headers;
+};
+export type undoSetResponseError = (
+  | undoSetResponse400
+  | undoSetResponse401
+  | undoSetResponse404
+  | undoSetResponse500
+) & {
+  headers: Headers;
+};
+
+export type undoSetResponse = undoSetResponseSuccess | undoSetResponseError;
+
+export const getUndoSetUrl = (
+  id: string,
+  dayId: string,
+  sessionId: string,
+  exerciseId: string,
+) => {
+  return `/trainify/api/v1/workout-plans/${id}/days/${dayId}/sessions/${sessionId}/exercises/${exerciseId}/sets`;
+};
+
+export const undoSet = async (
+  id: string,
+  dayId: string,
+  sessionId: string,
+  exerciseId: string,
+  undoSetBody: UndoSetBody,
+  options?: RequestInit,
+): Promise<undoSetResponse> => {
+  return customFetch<undoSetResponse>(
+    getUndoSetUrl(id, dayId, sessionId, exerciseId),
+    {
+      ...options,
+      method: "DELETE",
+      headers: { "Content-Type": "application/json", ...options?.headers },
+      body: JSON.stringify(undoSetBody),
+    },
+  );
+};
+
+/**
  * @summary Retorna os dados da home com base em uma data
  */
 export type getHomeDataResponse200 = {
@@ -1369,41 +1711,19 @@ export const upsertTrainData = async (
 /**
  * @summary Conversa com o personal trainer virtual
  */
-export type chatResponse201 = {
-  data: Chat201;
-  status: 201;
+export type chatResponse200 = {
+  data: void;
+  status: 200;
 };
 
-export type chatResponse400 = {
-  data: Chat400;
-  status: 400;
-};
-
-export type chatResponse401 = {
-  data: Chat401;
-  status: 401;
-};
-
-export type chatResponse500 = {
-  data: Chat500;
-  status: 500;
-};
-
-export type chatResponseSuccess = chatResponse201 & {
-  headers: Headers;
-};
-export type chatResponseError = (
-  | chatResponse400
-  | chatResponse401
-  | chatResponse500
-) & {
+export type chatResponseSuccess = chatResponse200 & {
   headers: Headers;
 };
 
-export type chatResponse = chatResponseSuccess | chatResponseError;
+export type chatResponse = chatResponseSuccess;
 
 export const getChatUrl = () => {
-  return `/trainify/api/v1/ia/chat`;
+  return `/trainify/api/v1/ai/chat`;
 };
 
 export const chat = async (

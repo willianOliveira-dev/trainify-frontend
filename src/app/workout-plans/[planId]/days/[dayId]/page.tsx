@@ -1,3 +1,4 @@
+import { getSessionSets } from "@/actions/workout-session/get-session-sets";
 import { NavigationBar } from "@/components/navigation-bar";
 import { Badge } from "@/components/ui/badge";
 import { ExerciseItem } from "@/components/workout-day/exercise-item";
@@ -8,6 +9,7 @@ import {
   getHomeData,
   getMe,
   getWorkoutPlanDayDetailsData,
+  type GetSessionSets200Item,
 } from "@/lib/api/fetch-generated";
 import { authClient } from "@/lib/auth-client";
 import dayjs from "dayjs";
@@ -61,11 +63,42 @@ export default async function WorkoutDayDetailsPage({ params }: PageProps) {
 
   const activeSession = sessions.find((s) => !s.completedAt);
   const isCompleted = sessions.some((s) => s.completedAt);
+  const totalSetsInWorkout = exercises.reduce((acc, e) => acc + e.sets, 0);
+
+  const completedSetsData: GetSessionSets200Item[] = [];
+
+  if (activeSession) {
+    const sessionSets = await getSessionSets(planId, dayId, activeSession.id);
+    if (sessionSets.status === 200) {
+      completedSetsData.push(...sessionSets.data);
+    }
+  }
+
+  const progressPercent =
+    totalSetsInWorkout > 0
+      ? Math.round((completedSetsData.length / totalSetsInWorkout) * 100)
+      : 0;
+
   const durationInMinutes = Math.floor(estimatedDurationInSeconds / 60);
 
   return (
     <div className="flex min-h-screen w-full max-w-md mx-auto flex-col bg-background text-foreground pb-25">
       <WorkoutDetailsHeader title={WEEK_DAY_MAP[weekDay].split("-")[0]} />
+
+      {activeSession && (
+        <div className="flex flex-col gap-1.5 px-5 pt-3">
+          <div className="flex justify-between text-xs text-muted-foreground">
+            <span>Progresso</span>
+            <span>{progressPercent}%</span>
+          </div>
+          <div className="h-1.5 w-full rounded-full bg-muted overflow-hidden">
+            <div
+              className="h-full rounded-full bg-primary transition-all duration-500"
+              style={{ width: `${progressPercent}%` }}
+            />
+          </div>
+        </div>
+      )}
 
       <main className="flex flex-col gap-6 px-5 py-4">
         <div className="relative h-56 w-full overflow-hidden rounded-2xl bg-black shadow-lg">
@@ -113,6 +146,15 @@ export default async function WorkoutDayDetailsPage({ params }: PageProps) {
               series={exercise.sets}
               reps={exercise.reps}
               restTimeInSeconds={exercise.restTimeInSeconds}
+              youtubeVideoId={exercise.youtubeVideoId}
+              exerciseId={exercise.id}
+              planId={planId}
+              dayId={dayId}
+              sessionId={activeSession?.id}
+              initialCompletedSets={completedSetsData
+                .filter((s) => s.exerciseId === exercise.id)
+                .map((s) => s.setNumber)}
+              totalSetsInWorkout={totalSetsInWorkout}
             />
           ))}
         </div>
