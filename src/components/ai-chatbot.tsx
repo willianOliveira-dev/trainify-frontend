@@ -34,16 +34,9 @@ export function AiChatbot({ embedded = false, initialMessage }: ChatProps) {
       api: `${process.env.NEXT_PUBLIC_API_URL}/trainify/api/v1/ai/chat`,
       credentials: "include",
     }),
-    onError: (error) => {
-      const isQuota =
-        error?.message?.includes("quota") ||
-        error?.message?.includes("exceeded") ||
-        error?.message?.includes("AI_QUOTA_EXCEEDED");
-
+    onError: () => {
       setErrorMessage(
-        isQuota
-          ? "Limite de requisições atingido. Tente novamente mais tarde."
-          : "Erro ao processar sua mensagem. Tente novamente.",
+        "Serviço temporariamente indisponível. Tente novamente mais tarde.",
       );
     },
   });
