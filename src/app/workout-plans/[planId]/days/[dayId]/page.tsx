@@ -107,7 +107,7 @@ export default async function WorkoutDayDetailsPage({ params }: PageProps) {
         className={cn(
           "flex flex-col gap-6 px-5 py-4 pb-28",
           "md:grid md:grid-cols-[minmax(280px,340px)_1fr] md:gap-8 md:px-8 md:py-8 md:pb-8 md:items-start",
-          "lg:max-w-5xl lg:px-10",
+          "lg:w-full lg:px-10",
         )}
       >
         <div className="flex flex-col gap-4 md:sticky md:top-6">
