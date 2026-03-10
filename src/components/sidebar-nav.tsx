@@ -5,7 +5,6 @@ import { Calendar, ChartNoAxesColumn, House, UserRound } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { ChatOpenButton } from "./chat-open-button";
-import { Button } from "./ui/button";
 
 interface SidebarNavProps {
   activePage?: "home" | "calendar" | "stats" | "profile";
@@ -64,19 +63,16 @@ export function SidebarNav({
 
             if (!href) {
               return (
-                <Button
+                <span
                   key={key}
-                  variant="ghost"
                   className={cn(
-                    "w-full justify-start gap-3 px-3 py-2.5 h-auto text-sm font-medium rounded-xl",
-                    isActive
-                      ? "bg-primary/10 text-primary"
-                      : "text-muted-foreground hover:text-foreground hover:bg-muted",
+                    "flex items-center gap-3 px-3 py-2.5 text-sm font-medium rounded-xl cursor-not-allowed opacity-50",
+                    "text-muted-foreground",
                   )}
                 >
                   <Icon className="size-5 shrink-0" />
                   {label}
-                </Button>
+                </span>
               );
             }
 

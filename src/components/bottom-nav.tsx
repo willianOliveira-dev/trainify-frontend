@@ -35,21 +35,12 @@ export function BottomNav({ activePage = "home", calendarHref }: BottomNavProps)
           />
         </Link>
       ) : (
-        <Button className="p-3">
-          <Calendar
-            className={cn(
-              "size-6",
-              activePage === "calendar"
-                ? "text-foreground"
-                : "text-muted-foreground",
-            )}
-          />
-        </Button>
+        <span className="p-3 opacity-50 cursor-not-allowed">
+          <Calendar className="size-6 text-muted-foreground" />
+        </span>
       )}
 
-      <div className="flex items-center justify-center size-14">
-        <ChatOpenButton />
-      </div>
+      <ChatOpenButton />
 
       <Link href="/stats" className="p-3">
         <ChartNoAxesColumn

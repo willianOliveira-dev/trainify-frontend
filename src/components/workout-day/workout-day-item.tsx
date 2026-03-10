@@ -33,8 +33,10 @@ export function WorkoutDayItem({
   if (isRest) {
     return (
       <div
-        className="flex flex-col h-[110px] items-start justify-between p-5 relative rounded-xl shrink-0 w-full overflow-hidden"
-        style={coverImageUrl ? {} : { backgroundColor: "white" }}
+        className={cn(
+          "flex flex-col h-28 md:h-50 items-start justify-between p-5 relative rounded-xl shrink-0 w-full overflow-hidden",
+          !coverImageUrl && "bg-muted",
+        )}
       >
         {coverImageUrl && (
           <Image src={coverImageUrl} alt={name} fill className="object-cover" />
@@ -43,7 +45,6 @@ export function WorkoutDayItem({
           className="absolute inset-0 bg-black/30"
           style={{ display: coverImageUrl ? "block" : "none" }}
         />
-
         <div className="flex items-center justify-center relative shrink-0 z-10">
           <Badge
             variant="secondary"
@@ -63,14 +64,14 @@ export function WorkoutDayItem({
             <Zap
               className={cn(
                 "size-5",
-                coverImageUrl ? "fill-white" : "fill-primary text-",
+                coverImageUrl ? "fill-white" : "fill-primary",
               )}
             />
           </div>
           <h3
             className={cn(
               "font-tight text-2xl font-semibold leading-none",
-              coverImageUrl ? "text-white" : "text-black",
+              coverImageUrl ? "text-white" : "text-foreground",
             )}
           >
             {name}
@@ -83,7 +84,7 @@ export function WorkoutDayItem({
   return (
     <Link
       href={`/workout-plans/${planId}/days/${id}`}
-      className="group relative h-[200px] w-full overflow-hidden rounded-xl bg-black block"
+      className="group relative h-50 w-full overflow-hidden rounded-xl bg-black block"
     >
       <Image
         src={coverImageUrl || "/workout-placeholder.png"}
@@ -91,7 +92,6 @@ export function WorkoutDayItem({
         fill
         className="object-cover opacity-60 transition-transform duration-500 group-hover:scale-105"
       />
-
       <div className="absolute inset-0 flex flex-col justify-between p-5">
         <div className="flex justify-start">
           <Badge
@@ -102,7 +102,6 @@ export function WorkoutDayItem({
             {weekDayLabel}
           </Badge>
         </div>
-
         <div className="flex flex-col gap-2">
           <h3 className="text-2xl font-bold text-white leading-tight">
             {name}

@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { WorkoutDayCard } from "@/components/workout-day/workout-day-card";
 import { getHomeData, getMe } from "@/lib/api/fetch-generated";
 import { authClient } from "@/lib/auth-client";
+import { cn } from "@/lib/utils";
 import dayjs from "dayjs";
 import { Sparkles } from "lucide-react";
 import { headers } from "next/headers";
@@ -79,13 +80,13 @@ export default async function Home() {
       </div>
 
       <main
-        className={[
+        className={cn(
           "flex flex-col gap-6 px-5 py-6 pb-28",
 
           "md:grid md:grid-cols-2 md:gap-8 md:px-8 md:py-8 md:pb-8",
 
-          "lg:max-w-5xl lg:px-10",
-        ].join(" ")}
+          "lg:w-full lg:px-10",
+        )}
       >
         <section className="flex flex-col gap-3">
           <div className="flex items-center justify-between">

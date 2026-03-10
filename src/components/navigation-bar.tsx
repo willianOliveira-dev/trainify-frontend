@@ -20,7 +20,6 @@ export async function NavigationBar({
 
   return (
     <>
-     
       <SidebarNav activePage={activePage} calendarHref={calendarHref} />
       <BottomNav activePage={activePage} calendarHref={calendarHref} />
     </>
