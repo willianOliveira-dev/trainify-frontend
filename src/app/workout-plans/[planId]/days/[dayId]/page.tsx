@@ -184,7 +184,7 @@ export default async function WorkoutDayDetailsPage({ params }: PageProps) {
         </WorkoutSessionProvider>
       </main>
 
-      <NavigationBar />
+      <NavigationBar activePage="calendar" />
     </div>
   );
 }
