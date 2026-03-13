@@ -96,8 +96,11 @@ export default async function Home() {
             <Button
               variant="link"
               className="h-auto p-0 text-xs font-normal text-primary"
+              asChild
             >
-              Ver histórico
+              <Link href="/stats">
+                   Ver histórico
+              </Link>
             </Button>
           </div>
           <ConsistencyIndicators
@@ -114,8 +117,11 @@ export default async function Home() {
             <Button
               variant="link"
               className="h-auto p-0 text-xs font-normal text-primary"
+              asChild
             >
+              <Link href={`/workout-plans/${homeData.data.activeWorkoutPlanId}`}>
               Ver treinos
+              </Link>
             </Button>
           </div>
 
