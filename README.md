@@ -1,67 +1,174 @@
 # Trainify Frontend
 
+<div align="center">
+  <img src="https://raw.githubusercontent.com/willianOliveira-dev/trainify-frontend/main/public/logo.png" alt="Trainify Logo" width="200"/>
+  
+  <br/>
+  
+  <img src="https://img.shields.io/badge/Next.js-16.x-000000?style=for-the-badge&logo=nextdotjs&logoColor=white" alt="Next.js"/>
+  <img src="https://img.shields.io/badge/React-19.x-61DAFB?style=for-the-badge&logo=react&logoColor=black" alt="React"/>
+  <img src="https://img.shields.io/badge/TypeScript-5.x-3178C6?style=for-the-badge&logo=typescript&logoColor=white" alt="TypeScript"/>
+  <img src="https://img.shields.io/badge/Tailwind-4.x-06B6D4?style=for-the-badge&logo=tailwindcss&logoColor=white" alt="Tailwind"/>
+  <img src="https://img.shields.io/badge/Google_AI-Gemini-4285F4?style=for-the-badge&logo=google&logoColor=white" alt="Google AI"/>
+</div>
+
+<br/>
+
 Aplicação web responsiva de última geração para o ecossistema Trainify. Projetada para performance, excelência estética e experiência de usuário premium.
 
-## A Visão
+---
+
+## Sobre o Projeto
 
 O frontend do Trainify é a interface para a evolução do treinamento. Transforma dados complexos de treino em uma experiência intuitiva e visualmente sofisticada. Construído com os recursos mais recentes do React 19 e Next.js 16, garante transições fluidas, interações em tempo real com IA e uma interface "viva" que se adapta à jornada fitness do usuário.
 
 ### Destaques Principais
-- **Estética Premium**: Desenvolvido com Tailwind CSS v4 e Framer Motion para animações e interações fluidas de alto padrão.
-- **UX Aprimorada por IA**: Chat integrado com IA e onboarding inteligente para personalizar a jornada do usuário.
-- **Integração Type-Safe com API**: Conexão direta com a API Trainify utilizando geração de código em nível enterprise (Orval).
-- **Responsivo e Focado em Performance**: Otimizado para atletas em dispositivos móveis e desktop utilizando padrões modernos da web.
+- **UX Aprimorada por IA**: Chat integrado com IA (@ai-sdk/react) e onboarding inteligente
+- **Type-Safe**: Integração com backend via cliente gerado pelo Orval
+- **Componentização**: Design system consistente com Radix UI e Shadcn/UI
+
+---
 
 ## Tecnologias
 
-- **Framework**: Next.js 16 (App Router, Server Actions)
-- **Biblioteca**: React 19
-- **Estilização**: Tailwind CSS v4
-- **Animações**: Framer Motion
-- **Componentes**: Radix UI e Shadcn/UI
-- **Estado e Formulários**: React Hook Form e Zod
-- **Autenticação**: Better Auth
-- **Cliente API**: Orval (geração type-safe de cliente)
+| Categoria | Tecnologias |
+|-----------|-------------|
+| **Framework** | Next.js 16 (App Router), React 19 |
+| **Estilização** | Tailwind CSS v4, class-variance-authority, tailwind-merge |
+| **Componentes** | Radix UI, Shadcn/UI, Vaul (drawers) |
+| **Formulários** | React Hook Form, Zod, @hookform/resolvers |
+| **Autenticação** | Better Auth 1.4.18 |
+| **Integrações** | AI SDK, @ai-sdk/react (Google Gemini) |
+| **Cliente API** | Orval (geração type-safe) |
+| **Utilitários** | Day.js, nuqs (query params), sonner (toasts) |
+| **Qualidade** | Biome, TypeScript |
 
-## Estrutura do Projeto
-
-- `src/app`: Estrutura moderna do App Router definindo a jornada do usuário (Onboarding, Planos de Treino, Estatísticas, Perfil).
-- `src/components`: Componentes UI atômicos e de alto nível construídos com Radix e Tailwind v4.
-- `src/hooks`: Lógica reativa customizada e hooks de interação com a API.
-- `src/lib`: Funções utilitárias principais e configurações do sistema.
-- `src/providers`: Context providers para temas, autenticação e estado global.
+---
 
 ## Primeiros Passos
 
 ### Pré-requisitos
 - Node.js 20+
-- Pnpm (recomendado)
+- pnpm (recomendado)
+- API Trainify em execução (local ou produção)
 
 ### Instalação
-```bash
-pnpm install
-```
 
-### Configuração de Ambiente
-Crie um arquivo `.env` baseado no `.env.example`:
 ```bash
+git clone https://github.com/willianOliveira-dev/trainify-frontend.git
+cd trainify-frontend
+pnpm install
 cp .env.example .env
 ```
 
-### Desenvolvimento
+Configure as variáveis no arquivo `.env`:
+```env
+NEXT_PUBLIC_API_URL=sua_url_da_api
+NEXT_PUBLIC_GOOGLE_AI_KEY=sua_chave_api
+```
+
+### Execução
+
 ```bash
-pnpm dev
+pnpm dev    # Modo desenvolvimento
+pnpm build  # Build para produção
+pnpm start  # Modo produção
 ```
 
 ### Sincronização com API
+
 Para atualizar o cliente API type-safe quando o esquema do backend for alterado:
+
 ```bash
 pnpm exec orval
 ```
 
-## Filosofia de UI
+---
 
-Acreditamos que o acompanhamento fitness deve ser tão motivador quanto o próprio treino. Nosso sistema de design prioriza clareza, microinterações e uma experiência coesa entre modos claro/escuro que se apresenta como moderna e profissional.
+## Estrutura do Projeto
+
+```
+src/
+├── actions/
+├── app/
+│   ├── auth/
+│   ├── onboarding/
+│   ├── profile/
+│   ├── stats/
+│   ├── workout-plans/
+│   ├── favicon.ico
+│   ├── globals.css
+│   ├── layout.tsx
+│   └── page.tsx
+├── components/
+├── config/
+├── constants/
+├── context/
+├── hooks/
+├── lib/
+└── providers/
+```
 
 ---
-*Potencializando sua evolução através de código e dedicação.*
+
+## Scripts Disponíveis
+
+| Comando | Descrição |
+|---------|-----------|
+| `pnpm dev` | Inicia servidor em desenvolvimento |
+| `pnpm build` | Compila para produção |
+| `pnpm start` | Inicia servidor em produção |
+| `pnpm lint` | Verifica problemas de código com Biome |
+| `pnpm format` | Formata código automaticamente |
+| `pnpm orval` | Gera cliente API type-safe |
+
+---
+
+## Integração com Backend
+
+O frontend consome a [Trainify API](https://github.com/willianOliveira-dev/trainify-api), que fornece:
+
+- Geração de treinos com Google AI (Gemini)
+- Gerenciamento de planos e sessões
+- Autenticação segura com Better Auth
+- Estatísticas e acompanhamento
+
+### Endpoints Consumidos
+
+| Método | Rota | Descrição |
+|--------|------|-----------|
+| POST | `/api/auth/*` | Autenticação |
+| GET | `/api/workout-plans` | Lista planos do usuário |
+| POST | `/api/ia/generate-workout` | Gera treino com IA |
+| POST | `/api/workout-sessions` | Inicia nova sessão |
+
+---
+
+## Funcionalidades Principais
+
+- **Geração com IA**: Chat integrado para criar treinos personalizados
+- **Design Responsivo**: Experiência otimizada para mobile e desktop
+- **Vídeos Demonstrativos**: Integração com YouTube para execução correta
+- **Dashboard Interativo**: Visualização de progresso e estatísticas
+- **Tema Claro/Escuro**: Suporte nativo com next-themes
+
+---
+
+## Filosofia de UI
+
+Acreditamos que o acompanhamento fitness deve ser tão motivador quanto o próprio treino. Nosso sistema de design prioriza:
+
+- **Clareza**: Informações apresentadas de forma intuitiva
+- **Microinterações**: Feedback visual em cada ação do usuário
+- **Coesão**: Experiência consistente entre modos claro/escuro
+- **Performance**: Carregamento otimizado e transições fluidas
+
+---
+
+## Aviso Legal
+
+Este projeto foi desenvolvido exclusivamente para fins educacionais e como parte de portfólio pessoal.
+
+- **Direitos Autorais**: A integração com a API do YouTube é utilizada apenas para busca de vídeos públicos. O Trainify não hospeda, reivindica autoria ou possui direitos sobre os vídeos exibidos.
+- **Natureza do Projeto**: Este não é um produto comercial. Os planos gerados por IA são demonstrações e não substituem orientação profissional qualificada.
+- **Uso do Código**: Sinta-se à vontade para explorar e usar como referência para seus próprios estudos.
