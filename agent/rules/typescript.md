@@ -1,8 +1,0 @@
-- Write clean, concise, and maintainable code, following SOLID and Clean Code principles.
-- Use descriptive variable names (examples: isLoading, hasError).
-- Use kebab-case for folder and file names.
-- Always use TypeScript to write code.
-- DRY (Don't Repeat Yourself). Avoid code duplication. When necessary, create reusable functions/components.
-- NEVER write comments in your code.
-- NEVER run `pnpm run dev` to check if changes are working.
-- **ALWAYS** use the `dayjs` library for date manipulation and formatting.
