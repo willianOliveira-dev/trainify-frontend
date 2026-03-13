@@ -16,7 +16,7 @@ export default async function StatsPage() {
     },
   });
 
-  if (!session?.data) {
+  if (!session.data?.user) {
     redirect("/auth");
   }
 

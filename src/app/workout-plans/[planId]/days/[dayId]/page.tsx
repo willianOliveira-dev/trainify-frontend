@@ -39,7 +39,7 @@ export default async function WorkoutDayDetailsPage({ params }: PageProps) {
     },
   });
 
-  if (!session.data) {
+  if (!session.data?.user) {
     redirect("/auth");
   }
 
