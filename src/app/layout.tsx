@@ -24,6 +24,7 @@ const interTight = Inter_Tight({
 
 import { AiChatbot } from "@/components/ai-chatbot";
 import { NuqsAdapter } from "nuqs/adapters/next/app";
+import { Suspense } from "react";
 
 export default function RootLayout({
   children,
@@ -37,7 +38,9 @@ export default function RootLayout({
       >
         <NuqsAdapter>
           {children}
-          <AiChatbot />
+          <Suspense fallback={null}>
+            <AiChatbot />
+          </Suspense>
         </NuqsAdapter>
         <Toaster />
       </body>

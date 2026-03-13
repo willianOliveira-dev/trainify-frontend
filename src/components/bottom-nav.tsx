@@ -5,6 +5,7 @@ import { Calendar, ChartNoAxesColumn, House, UserRound } from "lucide-react";
 import Link from "next/link";
 import { ChatOpenButton } from "./chat-open-button";
 import { Button } from "./ui/button";
+import { Suspense } from "react";
 
 interface BottomNavProps {
   activePage?: "home" | "calendar" | "stats" | "profile";
@@ -40,7 +41,9 @@ export function BottomNav({ activePage = "home", calendarHref }: BottomNavProps)
         </span>
       )}
 
-      <ChatOpenButton />
+      <Suspense fallback={<div className="size-14 animate-pulse bg-muted rounded-full" />}>
+        <ChatOpenButton />
+      </Suspense>
 
       <Link href="/stats" className="p-3">
         <ChartNoAxesColumn

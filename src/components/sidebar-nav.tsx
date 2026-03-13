@@ -11,6 +11,7 @@ import {
 import Image from "next/image";
 import Link from "next/link";
 import { parseAsBoolean, parseAsString, useQueryStates } from "nuqs";
+import { Suspense } from "react";
 
 interface SidebarNavProps {
   activePage?: "home" | "calendar" | "stats" | "profile";
@@ -132,7 +133,9 @@ export function SidebarNav({
 
       <div className="flex flex-col gap-3 px-2">
         <div className="h-px bg-border" />
-        <SidebarChatButton />
+        <Suspense fallback={<div className="h-14 animate-pulse bg-muted rounded-xl" />}>
+          <SidebarChatButton />
+        </Suspense>
       </div>
     </aside>
   );
